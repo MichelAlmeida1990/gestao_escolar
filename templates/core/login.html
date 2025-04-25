@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Entrar - Sistema de Gestão Escolar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-section {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .login-container {
+        max-width: 450px;
+        width: 100%;
+    }
+    
+    .login-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
+        padding: 2.5rem 2rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .login-logo {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    .login-subtitle {
+        color: #5a6a7e;
+        font-size: 1.1rem;
+    }
+    
+    .login-body {
+        padding: 2.5rem 2rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        height: calc(3.5rem + 2px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        border-color: rgba(67, 97, 238, 0.5);
+    }
+    
+    .form-floating label {
+        padding: 1rem;
+    }
+    
+    .btn-login {
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        color: white;
+        border: none;
+        padding: 0.9rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .btn-login:hover {
+        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.5);
+    }
+    
+    .login-footer {
+        text-align: center;
+        padding: 1.5rem 2rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.03), rgba(114, 9, 183, 0.03));
+    }
+    
+    .login-footer p {
+        color: #5a6a7e;
+        margin-bottom: 0;
+    }
+    
+    .login-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .login-footer a:hover {
+        color: var(--accent);
+        text-decoration: underline;
+    }
+    
+    .alert-login {
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="login-section">
+    <div class="container">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <i class="fas fa-school me-2"></i>Gestão Escolar
+                    </div>
+                    <div class="login-subtitle">
+                        Acesse sua conta para continuar
+                    </div>
+                </div>
+                
+                <div class="login-body">
+                    {% if form.errors %}
+                    <div class="alert alert-danger alert-login" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Usuário ou senha incorretos. Por favor, tente novamente.
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="id_username" name="username" placeholder="Nome de usuário" required>
+                            <label for="id_username">Nome de usuário</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="id_password" name="password" placeholder="Senha" required>
+                            <label for="id_password">Senha</label>
+                        </div>
+                        <button type="submit" class="btn btn-login">
+                            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                        </button>
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </form>
+                </div>
+                
+                <div class="login-footer">
+                    <p>Esqueceu sua senha? <a href="#">Recuperar acesso</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

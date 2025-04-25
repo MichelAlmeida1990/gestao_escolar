@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestão Escolar - Página Inicial{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section com design moderno e vibrante */
+    .hero-section {
+        position: relative;
+        padding: 6rem 0 8rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        overflow: hidden;
+        border-radius: 0 0 50px 50px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -10%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.1));
+        z-index: 0;
+    }
+    
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: -10%;
+        left: -10%;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(247, 37, 133, 0.1), rgba(181, 23, 158, 0.1));
+        z-index: 0;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+    
+    .hero-content h1 {
+        font-family: 'Montserrat', sans-serif;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        animation: fadeInDown 1s ease-out;
+        letter-spacing: -1px;
+    }
+    
+    .hero-content h2 {
+        font-family: 'Montserrat', sans-serif;
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 2.2rem;
+        margin-bottom: 1.5rem;
+        animation: fadeInDown 1.2s ease-out;
+    }
+    
+    .hero-content p {
+        color: #5a6a7e;
+        font-size: 1.2rem;
+        max-width: 800px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.7;
+        animation: fadeInUp 1.4s ease-out;
+    }
+    
+    .btn-custom-primary {
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        color: white;
+        border: none;
+        padding: 0.9rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .btn-custom-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: all 0.6s ease;
+        z-index: -1;
+    }
+    
+    .btn-custom-primary:hover {
+        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.5);
+    }
+    
+    .btn-custom-primary:hover::before {
+        left: 100%;
+    }
+
+    /* Cards de Recursos (Features) com design colorido */
+    .features-section {
+        margin-top: 2rem;
+        padding: 5rem 0;
+        position: relative;
+    }
+    
+    .section-title {
+        text-align: center;
+        margin-bottom: 4rem;
+        position: relative;
+    }
+    
+    .section-title h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title p {
+        color: #5a6a7e;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--secondary), var(--accent));
+        margin: 1rem auto;
+        border-radius: 2px;
+    }
+    
+    .feature-card {
+        background: white;
+        padding: 2.5rem 2rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        border-bottom: 4px solid transparent;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border-bottom: 4px solid var(--secondary);
+    }
+    
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .feature-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.1));
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon {
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.2), rgba(114, 9, 183, 0.2));
+        transform: scale(1.1);
+    }
+    
+    .feature-icon i {
+        font-size: 2.5rem;
+        color: var(--primary);
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon i {
+        color: var(--accent);
+    }
+    
+    .feature-card h3 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover h3 {
+        color: var(--accent);
+    }
+    
+    .feature-card p {
+        color: #5a6a7e;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    /* Seção CTA */
+    .cta-section {
+        padding: 5rem 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        text-align: center;
+        border-radius: 50px 50px 0 0;
+    }
+
+    .cta-content h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+        color: #5a6a7e;
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+    }
+
+    .btn-custom-secondary {
+        background: linear-gradient(45deg, var(--secondary), var(--secondary-light));
+        color: white;
+        border: none;
+        padding: 0.9rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(247, 37, 133, 0.4);
+    }
+
+    .btn-custom-secondary:hover {
+        background: linear-gradient(45deg, var(--secondary-dark), var(--secondary));
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(247, 37, 133, 0.5);
+        color: white;
+    }
+
+    /* Estatísticas */
+    .stats-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        margin-top: -100px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .stats-item h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-item p {
+        color: #5a6a7e;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    /* Animações */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Seção Hero (Banner Principal) -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Gestão Escolar</h1>
+            <h2>Simplifique a Administração da Sua Escola</h2>
+            <p>
+                Uma plataforma completa para gerenciar alunos, professores e turmas de forma eficiente e organizada. 
+                Otimize processos, acompanhe o progresso e mantenha tudo em um só lugar.
+            </p>
+            <a href="#" class="btn btn-custom-primary">Começar Agora</a>
+        </div>
+    </div>
+</section>
+
+<!-- Estatísticas -->
+<div class="container">
+    <div class="stats-card">
+        <div class="row">
+            <div class="col-md-4 stats-item">
+                <h3>0</h3>
+                <p>Professores</p>
+            </div>
+            <div class="col-md-4 stats-item">
+                <h3>0</h3>
+                <p>Alunos</p>
+            </div>
+            <div class="col-md-4 stats-item">
+                <h3>0</h3>
+                <p>Turmas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Seção de Recursos (Features) -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Funcionalidades</h2>
+            <p>Descubra como nossa plataforma pode ajudar na gestão da sua escola com ferramentas modernas e intuitivas.</p>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>Gestão de Alunos</h3>
+                    <p>Registre, edite e acompanhe informações de alunos com facilidade, mantendo todos os dados organizados.</p>
+                    <a href="#" class="btn btn-sm btn-primary mt-3">Ver Alunos</a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Controle de Professores</h3>
+                    <p>Gerencie o cadastro de professores, associe-os a turmas e acompanhe suas atividades.</p>
+                    <a href="#" class="btn btn-sm btn-primary mt-3">Ver Professores</a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Organização de Turmas</h3>
+                    <p>Crie turmas, associe alunos e professores, e tenha uma visão clara de toda a estrutura escolar.</p>
+                    <a href="#" class="btn btn-sm btn-primary mt-3">Ver Turmas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção de Chamada para Ação (CTA) -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Transforme a Gestão da Sua Escola</h2>
+            <p>Comece agora mesmo a organizar sua escola de forma prática e eficiente com nossa plataforma.</p>
+            <div class="mt-4">
+                <a href="#" class="btn btn-custom-secondary me-2 mb-2">
+                    <i class="fas fa-plus"></i> Novo Professor
+                </a>
+                <a href="#" class="btn btn-custom-secondary me-2 mb-2">
+                    <i class="fas fa-plus"></i> Novo Aluno
+                </a>
+                <a href="#" class="btn btn-custom-secondary mb-2">
+                    <i class="fas fa-plus"></i> Nova Turma
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

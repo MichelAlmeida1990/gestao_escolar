@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Alunos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Dashboard - Alunos</h1>
+        <a href="{% url 'aluno_list' %}" class="btn btn-primary">
+            <i class="fas fa-list"></i> Lista de Alunos
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Total de Alunos</h6>
+                            <h1 class="display-4">{{ total_alunos }}</h1>
+                        </div>
+                        <i class="fas fa-users fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{% url 'aluno_list' %}" class="text-white text-decoration-none small">Ver detalhes</a>
+                    <i class="fas fa-angle-right text-white"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Alunos Ativos</h6>
+                            <h1 class="display-4">{{ alunos_ativos }}</h1>
+                        </div>
+                        <i class="fas fa-user-check fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{% url 'aluno_list' %}?search=ativo" class="text-white text-decoration-none small">Ver detalhes</a>
+                    <i class="fas fa-angle-right text-white"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Alunos Inativos</h6>
+                            <h1 class="display-4">{{ alunos_inativos }}</h1>
+                        </div>
+                        <i class="fas fa-user-times fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{% url 'aluno_list' %}?search=inativo" class="text-white text-decoration-none small">Ver detalhes</a>
+                    <i class="fas fa-angle-right text-white"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Alunos Transferidos</h6>
+                            <h1 class="display-4">{{ alunos_transferidos }}</h1>
+                        </div>
+                        <i class="fas fa-exchange-alt fa-3x opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a href="{% url 'aluno_list' %}?search=transferido" class="text-white text-decoration-none small">Ver detalhes</a>
+                    <i class="fas fa-angle-right text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gráficos e estatísticas -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Estatísticas de Alunos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Distribuição por Status</h6>
+                            <div class="progress mb-4" style="height: 25px;">
+                                {% if total_alunos > 0 %}
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                    style="width: {{ porcentagem_ativos|floatformat:'0' }}%;"
+                                         aria-valuenow="{{ alunos_ativos }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="{{ total_alunos }}">
+                                        Ativos ({{ alunos_ativos }})
+                                    </div>
+                                    <div class="progress-bar bg-danger" role="progressbar" 
+                                         style="width: {{ porcentagem_inativos|floatformat:0 }}%;" 
+                                         aria-valuenow="{{ alunos_inativos }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="{{ total_alunos }}">
+                                        Inativos ({{ alunos_inativos }})
+                                    </div>
+                                    <div class="progress-bar bg-warning" role="progressbar" 
+                                         style="width: {{ porcentagem_transferidos|floatformat:0 }}%;" 
+                                         aria-valuenow="{{ alunos_transferidos }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="{{ total_alunos }}">
+                                        Transferidos ({{ alunos_transferidos }})
+                                    </div>
+                                {% else %}
+                                    <div class="progress-bar bg-secondary" role="progressbar" style="width: 100%;">
+                                        Nenhum aluno cadastrado
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Dica: Você pode cadastrar novos alunos clicando no botão "Novo Aluno" na página de listagem.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
