@@ -70,35 +70,30 @@ def lancar_notas(request, avaliacao_id):
     avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
     alunos = Aluno.objects.filter(turma=avaliacao.turma)
     
-    # Dicionário para armazenar as notas existentes
-    notas = {}
-    for nota in Nota.objects.filter(avaliacao=avaliacao):
-        notas[nota.aluno.id] = nota.valor
-    
+    # Verificar se já existem notas lançadas e criar ou atualizar
     if request.method == 'POST':
         for aluno in alunos:
-            nota_valor = request.POST.get(f'aluno_{aluno.id}')
-            if nota_valor and nota_valor.strip():
-                try:
-                    nota_valor = float(nota_valor)
-                    if 0 <= nota_valor <= 10:  # Validação do valor da nota
-                        Nota.objects.update_or_create(
-                            aluno=aluno,
-                            avaliacao=avaliacao,
-                            defaults={'valor': nota_valor}
-                        )
-                except ValueError:
-                    pass  # Ignorar valores inválidos
-        
+            valor_nota = request.POST.get(f'nota_{aluno.id}')
+            if valor_nota:
+                nota, created = Nota.objects.update_or_create(
+                    aluno=aluno,
+                    avaliacao=avaliacao,
+                    defaults={'valor': float(valor_nota)}
+                )
         messages.success(request, "Notas lançadas com sucesso!")
         return redirect('notas:avaliacao_list')
+    
+    # Preparar notas existentes para exibição
+    notas_dict = {}
+    notas_existentes = Nota.objects.filter(avaliacao=avaliacao)
+    for nota in notas_existentes:
+        notas_dict[nota.aluno.id] = nota.valor
     
     context = {
         'avaliacao': avaliacao,
         'alunos': alunos,
-        'notas': notas,
+        'notas_dict': notas_dict,
     }
-    
     return render(request, 'notas/lancar_notas.html', context)
 
 # Boletim
@@ -116,53 +111,25 @@ def selecionar_aluno_boletim(request):
 def boletim_aluno(request, aluno_id):
     aluno = get_object_or_404(Aluno, pk=aluno_id)
     
-    # Estrutura para armazenar dados do boletim
-    disciplinas = {}
+    # Agrupar notas por disciplina
+    disciplinas = Disciplina.objects.filter(avaliacao__nota__aluno=aluno).distinct()
+    boletim = []
     
-    # Obter todas as disciplinas que o aluno tem avaliações
-    disciplinas_aluno = Disciplina.objects.filter(
-        avaliacao__nota__aluno=aluno
-    ).distinct()
-    
-    for disciplina in disciplinas_aluno:
-        avaliacoes = Avaliacao.objects.filter(
-            disciplina=disciplina,
-            turma=aluno.turma
-        ).order_by('data')
+    for disciplina in disciplinas:
+        avaliacoes = Avaliacao.objects.filter(disciplina=disciplina, nota__aluno=aluno)
+        notas = Nota.objects.filter(avaliacao__disciplina=disciplina, aluno=aluno)
+        media = notas.aggregate(Avg('valor'))['valor__avg']
         
-        # Preparar dados de avaliações com notas
-        avaliacoes_com_notas = []
-        for avaliacao in avaliacoes:
-            try:
-                nota = Nota.objects.get(aluno=aluno, avaliacao=avaliacao)
-                valor_nota = nota.valor
-            except Nota.DoesNotExist:
-                valor_nota = None
-                
-            avaliacoes_com_notas.append({
-                'titulo': avaliacao.titulo,
-                'data': avaliacao.data,
-                'peso': avaliacao.peso,
-                'nota': valor_nota
-            })
-        
-        # Calcular média
-        notas_disciplina = Nota.objects.filter(
-            aluno=aluno, 
-            avaliacao__disciplina=disciplina
-        )
-        media = notas_disciplina.aggregate(Avg('valor'))['valor__avg']
-        
-        # Adicionar informações da disciplina ao dicionário
-        disciplinas[disciplina.nome] = {
-            'professor': disciplina.professor,
-            'avaliacoes': avaliacoes_com_notas,
-            'media': media
+        item_boletim = {
+            'disciplina': disciplina,
+            'notas': notas,
+            'media': media,
         }
+        boletim.append(item_boletim)
     
     context = {
         'aluno': aluno,
-        'disciplinas': disciplinas
+        'boletim': boletim,
     }
     return render(request, 'notas/boletim_aluno.html', context)
 

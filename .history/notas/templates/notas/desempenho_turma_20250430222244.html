@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% block title %}Desempenho da Turma - {{ turma }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Desempenho da Turma</h1>
+        <button onclick="window.print()" class="btn btn-outline-secondary">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">{{ turma }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Total de Alunos:</strong> {{ total_alunos }}</p>
+                    <p><strong>Ano Letivo:</strong> {{ turma.ano_letivo }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Série:</strong> {{ turma.serie }}</p>
+                    <p><strong>Período:</strong> {{ turma.get_periodo_display }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Estatísticas Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Aprovação Geral</h6>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                style="width: {{ estatisticas.percentual_aprovados }}%;" 
+                                aria-valuenow="{{ estatisticas.percentual_aprovados }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ estatisticas.percentual_aprovados }}%
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small>Aprovados: {{ estatisticas.total_aprovados }}</small>
+                            <small>Reprovados: {{ estatisticas.total_reprovados }}</small>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6>Médias por Disciplina</h6>
+                        <ul class="list-group">
+                            {% for disciplina, media in estatisticas.medias_disciplinas.items %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ disciplina }}
+                                    <span class="badge {% if media >= 6 %}bg-success{% else %}bg-danger{% endif %} rounded-pill">
+                                        {{ media|floatformat:1 }}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Distribuição de Notas</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="notasDistribuicao" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Desempenho dos Alunos</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Aluno</th>
+                            {% for disciplina in disciplinas %}
+                                <th>{{ disciplina.nome }}</th>
+                            {% endfor %}
+                            <th>Média Geral</th>
+                            <th>Situação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for aluno, dados in desempenho_alunos.items %}
+                            <tr>
+                                <td>{{ aluno.nome }}</td>
+                                {% for disciplina in disciplinas %}
+                                    <td>
+                                        {% with media=dados.medias_disciplinas|get_item:disciplina.id %}
+                                            {% if media != None %}
+                                                <span class="{% if media < 6 %}text-danger{% else %}text-success{% endif %}">
+                                                    {{ media|floatformat:1 }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                {% endfor %}
+                                <td>
+                                    {% if dados.media_geral != None %}
+                                        <span class="{% if dados.media_geral < 6 %}text-danger{% else %}text-success{% endif %} fw-bold">
+                                            {{ dados.media_geral|floatformat:1 }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dados.media_geral != None %}
+                                        {% if dados.media_geral >= 6 %}
+                                            <span class="badge bg-success">Aprovado</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Reprovado</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">Pendente</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="{{ disciplinas|length|add:3 }}" class="text-center py-3">
+                                    Nenhum aluno cadastrado nesta turma.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('notasDistribuicao').getContext('2d');
+        
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['0-2', '2-4', '4-6', '6-8', '8-10'],
+                datasets: [{
+                    label: 'Distribuição de Notas',
+                    data: [
+                        {{ estatisticas.distribuicao_notas.0 }},
+                        {{ estatisticas.distribuicao_notas.1 }},
+                        {{ estatisticas.distribuicao_notas.2 }},
+                        {{ estatisticas.distribuicao_notas.3 }},
+                        {{ estatisticas.distribuicao_notas.4 }}
+                    ],
+                    backgroundColor: [
+                        'rgba(220, 53, 69, 0.7)',  // Vermelho (0-2)
+                        'rgba(255, 193, 7, 0.7)',  // Amarelo (2-4)
+                        'rgba(255, 193, 7, 0.7)',  // Amarelo (4-6)
+                        'rgba(40, 167, 69, 0.7)',  // Verde (6-8)
+                        'rgba(40, 167, 69, 0.7)'   // Verde (8-10)
+                    ],
+                    borderColor: [
+                        'rgb(220, 53, 69)',
+                        'rgb(255, 193, 7)',
+                        'rgb(255, 193, 7)',
+                        'rgb(40, 167, 69)',
+                        'rgb(40, 167, 69)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Quantidade de Alunos'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Faixas de Notas'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+<style type="text/css" media="print">
+    @media print {
+        .btn, .navbar, footer {
+            display: none !important;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+        }
+        .card {
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .table-light {
+            background-color: #f8f9fa !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .text-danger {
+            color: #dc3545 !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .text-success {
+            color: #198754 !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .badge {
+            border: 1px solid #ddd;
+            -webkit-print-color-adjust: exact;
+        }
+        .bg-success {
+            background-color: #198754 !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .bg-danger {
+            background-color: #dc3545 !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .progress-bar {
+            -webkit-print-color-adjust: exact;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Selecionar Aluno para Boletim{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Selecionar Aluno para Boletim</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="get" class="card p-3 shadow-sm">
+                <div class="mb-3">
+                    <label for="turma" class="form-label">Filtrar por Turma:</label>
+                    <select name="turma" id="turma" class="form-select" onchange="this.form.submit()">
+                        <option value="">Todas as Turmas</option>
+                        {% for turma in turmas %}
+                            <option value="{{ turma.id }}" {% if turma_selecionada == turma.id %}selected{% endif %}>
+                                {{ turma }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form method="get" class="card p-3 shadow-sm">
+                <div class="mb-3">
+                    <label for="q" class="form-label">Buscar Aluno:</label>
+                    <div class="input-group">
+                        <input type="text" name="q" id="q" class="form-control" placeholder="Nome ou matrícula..." value="{{ query }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Matrícula</th>
+                        <th>Nome</th>
+                        <th>Turma</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos %}
+                        <tr>
+                            <td>{{ aluno.matricula }}</td>
+                            <td>{{ aluno.nome }}</td>
+                            <td>{{ aluno.turma }}</td>
+                            <td>
+                                <a href="{% url 'notas:boletim_aluno' aluno.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-file-alt"></i> Ver Boletim
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-3">
+                                {% if turma_selecionada or query %}
+                                    Nenhum aluno encontrado com os filtros aplicados.
+                                {% else %}
+                                    Nenhum aluno cadastrado no sistema.
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if alunos.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if alunos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if turma_selecionada %}&turma={{ turma_selecionada }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ alunos.previous_page_number }}{% if turma_selecionada %}&turma={{ turma_selecionada }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                    </li>
+                {% endif %}
+
+                {% for i in alunos.paginator.page_range %}
+                    {% if alunos.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                    {% elif i > alunos.number|add:'-3' and i < alunos.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if turma_selecionada %}&turma={{ turma_selecionada }}{% endif %}{% if query %}&q={{ query }}{% endif %}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if alunos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ alunos.next_page_number }}{% if turma_selecionada %}&turma={{ turma_selecionada }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ alunos.paginator.num_pages }}{% if turma_selecionada %}&turma={{ turma_selecionada }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

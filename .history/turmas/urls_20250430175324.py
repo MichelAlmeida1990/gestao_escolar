@@ -1,8 +1,6 @@
 from django.urls import path
 from . import views
 
-app_name = 'turmas'  # Adicionado o namespace
-
 urlpatterns = [
     path('', views.TurmaListView.as_view(), name='turma_list'),
     path('<int:pk>/', views.TurmaDetailView.as_view(), name='turma_detail'),

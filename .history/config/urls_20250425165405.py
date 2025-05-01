@@ -8,9 +8,9 @@ from core.views import custom_logout  # Certifique-se de que esta função exist
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    path('alunos/', include('alunos.urls')),
+    path('alunos/', include('alunos.urls')),  # Esta linha já existe, está correta
     path('professores/', include('professores.urls')),
-    path('turmas/', include('turmas.urls', namespace='turmas')),  # Adicionado o namespace
+    path('turmas/', include('turmas.urls')),
     path('notas/', include('notas.urls')),
     
     # URLs de autenticação

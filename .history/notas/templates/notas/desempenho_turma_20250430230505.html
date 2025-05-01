@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Desempenho da Turma - {{ turma.nome }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Desempenho da Turma</h1>
+        <button onclick="window.print()" class="btn btn-outline-secondary">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Informações da Turma</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Turma:</strong> {{ turma.nome }}</p>
+                    <p><strong>Ano Letivo:</strong> {{ turma.ano_letivo }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Total de Alunos:</strong> {{ turma.aluno_set.count }}</p>
+                    <p><strong>Série:</strong> {{ turma.serie }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if desempenho %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Desempenho por Disciplina</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Disciplina</th>
+                                <th>Média da Turma</th>
+                                <th>Aprovados</th>
+                                <th>Taxa de Aprovação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in desempenho %}
+                                <tr>
+                                    <td>{{ item.disciplina.nome }}</td>
+                                    <td>
+                                        {% if item.media_turma %}
+                                            <span class="{% if item.media_turma < 6 %}text-danger{% else %}text-success{% endif %} fw-bold">
+                                                {{ item.media_turma|floatformat:1 }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.aprovados }} / {{ item.total_alunos }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 10px;">
+                                                <div class="progress-bar {% if item.taxa_aprovacao < 60 %}bg-danger{% elif item.taxa_aprovacao < 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ item.taxa_aprovacao }}%;" 
+                                                     aria-valuenow="{{ item.taxa_aprovacao }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <span>{{ item.taxa_aprovacao|floatformat:1 }}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Médias por Disciplina</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="mediaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Taxa de Aprovação</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="aprovacaoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Não há dados de desempenho disponíveis para esta turma.
+        </div>
+    {% endif %}
+</div>
+
+<style type="text/css" media="print">
+    @media print {
+        .btn, .navbar, footer {
+            display: none !important;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+        }
+        .card {
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .table-light {
+            background-color: #f8f9fa !important;
+            -webkit-print-color-adjust: exact;
+        }
+        .progress-bar {
+            -webkit-print-color-adjust: exact;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{% if desempenho %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dados para os gráficos
+        const disciplinas = [{% for item in desempenho %}'{{ item.disciplina.nome }}',{% endfor %}];
+        const medias = [{% for item in desempenho %}{{ item.media_turma|default:0|floatformat:1 }},{% endfor %}];
+        const aprovacao = [{% for item in desempenho %}{{ item.taxa_aprovacao|floatformat:1 }},{% endfor %}];
+        
+        // Gráfico de médias
+        const mediaCtx = document.getElementById('mediaChart').getContext('2d');
+        new Chart(mediaCtx, {
+            type: 'bar',
+            data: {
+                labels: disciplinas,
+                datasets: [{
+                    label: 'Média da Turma',
+                    data: medias,
+                    backgroundColor: medias.map(value => value < 6 ? 'rgba(220, 53, 69, 0.7)' : 'rgba(25, 135, 84, 0.7)'),
+                    borderColor: medias.map(value => value < 6 ? 'rgb(220, 53, 69)' : 'rgb(25, 135, 84)'),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: {
+                            stepSize: 2
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de aprovação
+        const aprovacaoCtx = document.getElementById('aprovacaoChart').getContext('2d');
+        new Chart(aprovacaoCtx, {
+            type: 'doughnut',
+            data: {
+                labels: disciplinas,
+                datasets: [{
+                    data: aprovacao,
+                    backgroundColor: aprovacao.map(value => {
+                        if (value < 60) return 'rgba(220, 53, 69, 0.7)';
+                        if (value < 80) return 'rgba(255, 193, 7, 0.7)';
+                        return 'rgba(25, 135, 84, 0.7)';
+                    }),
+                    borderColor: aprovacao.map(value => {
+                        if (value < 60) return 'rgb(220, 53, 69)';
+                        if (value < 80) return 'rgb(255, 193, 7)';
+                        return 'rgb(25, 135, 84)';
+                    }),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

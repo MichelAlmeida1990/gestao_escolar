@@ -4,9 +4,6 @@ from . import views
 app_name = 'notas'
 
 urlpatterns = [
-    # Rota padrão
-    path('', views.DisciplinaListView.as_view(), name='index'),
-    
     # Disciplinas
     path('disciplinas/', views.DisciplinaListView.as_view(), name='disciplina_list'),
     path('disciplinas/nova/', views.DisciplinaCreateView.as_view(), name='disciplina_create'),

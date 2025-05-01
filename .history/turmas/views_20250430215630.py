@@ -9,7 +9,7 @@ from .forms import TurmaForm, AlunoTurmaForm
 
 class TurmaListView(ListView):
     model = Turma
-    ordering = ['nome']
+      ordering = ['nome']
     template_name = 'turmas/turma_list.html'
     context_object_name = 'turmas'
     paginate_by = 10

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Lançar Notas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Lançar Notas</h1>
+    
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">{{ avaliacao.titulo }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Disciplina:</strong> {{ avaliacao.disciplina }}</p>
+                    <p><strong>Data:</strong> {{ avaliacao.data|date:"d/m/Y" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Turma:</strong> {{ avaliacao.disciplina.turma }}</p>
+                    <p><strong>Peso:</strong> {{ avaliacao.peso }}</p>
+                </div>
+            </div>
+            {% if avaliacao.descricao %}
+                <div class="mt-2">
+                    <p><strong>Descrição:</strong></p>
+                    <p>{{ avaliacao.descricao }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Nota (0-10)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for aluno in alunos %}
+                            <tr>
+                                <td>{{ aluno.nome }}</td>
+                                <td>
+                                    <input 
+                                        type="number" 
+                                        name="aluno_{{ aluno.id }}" 
+                                        class="form-control" 
+                                        min="0" 
+                                        max="10" 
+                                        step="0.1" 
+                                        value="{{ notas|get_item:aluno.id|default:'' }}"
+                                    >
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center">Nenhum aluno cadastrado nesta turma.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'notas:avaliacao_list' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-success">Salvar Notas</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validação para garantir que as notas estejam entre 0 e 10
+    document.querySelectorAll('input[type="number"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            let value = parseFloat(this.value);
+            if (value < 0) this.value = 0;
+            if (value > 10) this.value = 10;
+        });
+    });
+</script>
+{% endblock %}

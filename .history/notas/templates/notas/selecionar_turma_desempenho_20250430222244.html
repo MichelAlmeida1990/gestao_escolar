@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Selecionar Turma para Relatório de Desempenho{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Relatórios de Desempenho por Turma</h1>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Filtrar Turmas</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        <div class="mb-3">
+                            <label for="ano_letivo" class="form-label">Ano Letivo:</label>
+                            <select name="ano_letivo" id="ano_letivo" class="form-select" onchange="this.form.submit()">
+                                <option value="">Todos os Anos</option>
+                                {% for ano in anos_letivos %}
+                                    <option value="{{ ano }}" {% if ano_letivo_selecionado == ano %}selected{% endif %}>
+                                        {{ ano }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="serie" class="form-label">Série:</label>
+                            <select name="serie" id="serie" class="form-select" onchange="this.form.submit()">
+                                <option value="">Todas as Séries</option>
+                                {% for serie in series %}
+                                    <option value="{{ serie }}" {% if serie_selecionada == serie %}selected{% endif %}>
+                                        {{ serie }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="periodo" class="form-label">Período:</label>
+                            <select name="periodo" id="periodo" class="form-select" onchange="this.form.submit()">
+                                <option value="">Todos os Períodos</option>
+                                {% for key, value in periodos %}
+                                    <option value="{{ key }}" {% if periodo_selecionado == key %}selected{% endif %}>
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Estatísticas Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h2 class="mb-1">{{ total_turmas }}</h2>
+                                    <p class="mb-0 text-muted">Turmas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h2 class="mb-1">{{ total_alunos }}</h2>
+                                    <p class="mb-0 text-muted">Alunos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h2 class="mb-1">{{ total_disciplinas }}</h2>
+                                    <p class="mb-0 text-muted">Disciplinas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h2 class="mb-1">{{ total_avaliacoes }}</h2>
+                                    <p class="mb-0 text-muted">Avaliações</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Turmas Disponíveis</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Turma</th>
+                        <th>Série</th>
+                        <th>Período</th>
+                        <th>Ano Letivo</th>
+                        <th>Alunos</th>
+                        <th>Disciplinas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turma in turmas %}
+                        <tr>
+                            <td>{{ turma.nome }}</td>
+                            <td>{{ turma.serie }}</td>
+                            <td>{{ turma.get_periodo_display }}</td>
+                            <td>{{ turma.ano_letivo }}</td>
+                            <td>{{ turma.aluno_set.count }}</td>
+                            <td>{{ turma.disciplina_set.count }}</td>
+                            <td>
+                                <a href="{% url 'notas:desempenho_turma' turma.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-chart-line"></i> Ver Desempenho
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-3">
+                                {% if ano_letivo_selecionado or serie_selecionada or periodo_selecionado %}
+                                    Nenhuma turma encontrada com os filtros aplicados.
+                                {% else %}
+                                    Nenhuma turma cadastrada no sistema.
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if turmas.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if turmas.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if ano_letivo_selecionado %}&ano_letivo={{ ano_letivo_selecionado }}{% endif %}{% if serie_selecionada %}&serie={{ serie_selecionada }}{% endif %}{% if periodo_selecionado %}&periodo={{ periodo_selecionado }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ turmas.previous_page_number }}{% if ano_letivo_selecionado %}&ano_letivo={{ ano_letivo_selecionado }}{% endif %}{% if serie_selecionada %}&serie={{ serie_selecionada }}{% endif %}{% if periodo_selecionado %}&periodo={{ periodo_selecionado }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                    </li>
+                {% endif %}
+
+                {% for i in turmas.paginator.page_range %}
+                    {% if turmas.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                    {% elif i > turmas.number|add:'-3' and i < turmas.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if ano_letivo_selecionado %}&ano_letivo={{ ano_letivo_selecionado }}{% endif %}{% if serie_selecionada %}&serie={{ serie_selecionada }}{% endif %}{% if periodo_selecionado %}&periodo={{ periodo_selecionado }}{% endif %}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if turmas.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ turmas.next_page_number }}{% if ano_letivo_selecionado %}&ano_letivo={{ ano_letivo_selecionado }}{% endif %}{% if serie_selecionada %}&serie={{ serie_selecionada }}{% endif %}{% if periodo_selecionado %}&periodo={{ periodo_selecionado }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ turmas.paginator.num_pages }}{% if ano_letivo_selecionado %}&ano_letivo={{ ano_letivo_selecionado }}{% endif %}{% if serie_selecionada %}&serie={{ serie_selecionada }}{% endif %}{% if periodo_selecionado %}&periodo={{ periodo_selecionado }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}
