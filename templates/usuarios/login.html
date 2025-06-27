@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Sistema de Gestão Escolar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-section {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .login-container {
+        max-width: 500px;
+        width: 100%;
+    }
+    
+    .login-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+    
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
+        padding: 3rem 2.5rem 2rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .login-logo {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .login-logo i {
+        margin-right: 0.75rem;
+        font-size: 2.5rem;
+    }
+    
+    .login-subtitle {
+        color: #5a6a7e;
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+    
+    .login-body {
+        padding: 2.5rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-control {
+        border-radius: 12px;
+        padding: 1rem 1rem 1rem 3rem;
+        height: calc(3.5rem + 2px);
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        border-color: var(--primary);
+        outline: none;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 10;
+    }
+    
+    .form-floating label {
+        padding: 1rem 1rem 1rem 3rem;
+        font-weight: 500;
+        color: #6c757d;
+    }
+    
+    .remember-me {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .remember-me input {
+        margin-right: 0.5rem;
+    }
+    
+    .btn-login {
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-login:hover {
+        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(67, 97, 238, 0.5);
+    }
+    
+    .btn-login i {
+        margin-right: 0.5rem;
+    }
+    
+    .login-footer {
+        text-align: center;
+        padding: 2rem 2.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.03), rgba(114, 9, 183, 0.03));
+    }
+    
+    .login-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .login-footer a:hover {
+        color: var(--accent);
+    }
+    
+    .login-footer a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 50%;
+        background: var(--primary);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+    
+    .login-footer a:hover::after {
+        width: 100%;
+    }
+    
+    .alert-login {
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(45deg, #ffe6e6, #ffcccc);
+        color: #721c24;
+    }
+    
+    .user-type-selector {
+        margin-bottom: 2rem;
+    }
+    
+    .user-type-btn {
+        background: transparent;
+        border: 2px solid rgba(67, 97, 238, 0.2);
+        color: var(--primary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        margin: 0.25rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .user-type-btn.active,
+    .user-type-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .security-info {
+        background: linear-gradient(45deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        border-left: 4px solid var(--primary);
+    }
+    
+    .security-info small {
+        color: #5a6a7e;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="login-section">
+    <div class="container">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        Gestão Escolar
+                    </div>
+                    <div class="login-subtitle">
+                        Acesse sua conta para continuar
+                    </div>
+                </div>
+                
+                <div class="login-body">
+                    {% if form.errors or form.non_field_errors %}
+                    <div class="alert alert-danger alert-login" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {% if form.non_field_errors %}
+                            {{ form.non_field_errors.0 }}
+                        {% else %}
+                            Usuário ou senha incorretos. Por favor, tente novamente.
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'usuarios:login' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-floating">
+                            <i class="fas fa-user input-icon"></i>
+                            {{ form.username }}
+                            <label for="id_username">{{ form.username.label }}</label>
+                        </div>
+                        
+                        <div class="form-floating">
+                            <i class="fas fa-lock input-icon"></i>
+                            {{ form.password }}
+                            <label for="id_password">{{ form.password.label }}</label>
+                        </div>
+                        
+                        {% if form.remember_me %}
+                        <div class="remember-me">
+                            {{ form.remember_me }}
+                            <label for="id_remember_me">{{ form.remember_me.label }}</label>
+                        </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-login">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Entrar no Sistema
+                        </button>
+                        
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </form>
+                    
+                    <div class="security-info">
+                        <small><i class="fas fa-shield-alt me-1"></i> Sua sessão é segura e monitorada</small>
+                        <small><i class="fas fa-clock me-1"></i> Sessão expira automaticamente por inatividade</small>
+                        <small><i class="fas fa-eye me-1"></i> Tentativas de login são registradas</small>
+                    </div>
+                </div>
+                
+                <div class="login-footer">
+                    <p class="mb-2">Esqueceu sua senha?</p>
+                    <a href="{% url 'usuarios:recuperar_senha' %}">
+                        <i class="fas fa-key me-1"></i>Recuperar acesso
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar efeito de foco nos inputs
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+    });
+    
+    // Verificar se há inputs com valor ao carregar
+    inputs.forEach(input => {
+        if (input.value) {
+            input.parentElement.classList.add('focused');
+        }
+    });
+});
+</script>
+{% endblock %} 

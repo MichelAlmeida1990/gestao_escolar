@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Avaliações{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Avaliações</h1>
+        <div>
+            <a href="{% url 'notas:avaliacao_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nova Avaliação
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filtros</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="disciplina" class="form-label">Disciplina</label>
+                    <select name="disciplina" id="disciplina" class="form-select">
+                        <option value="">Todas as disciplinas</option>
+                        {% for disciplina in disciplinas %}
+                            <option value="{{ disciplina.id }}" {% if request.GET.disciplina == disciplina.id|stringformat:"i" %}selected{% endif %}>
+                                {{ disciplina.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="turma" class="form-label">Turma</label>
+                    <select name="turma" id="turma" class="form-select">
+                        <option value="">Todas as turmas</option>
+                        {% for turma in turmas %}
+                            <option value="{{ turma.id }}" {% if request.GET.turma == turma.id|stringformat:"i" %}selected{% endif %}>
+                                {{ turma.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="periodo" class="form-label">Período</label>
+                    <select name="periodo" id="periodo" class="form-select">
+                        <option value="">Todos os períodos</option>
+                        <option value="Manhã" {% if request.GET.periodo == "Manhã" %}selected{% endif %}>Manhã</option>
+                        <option value="Tarde" {% if request.GET.periodo == "Tarde" %}selected{% endif %}>Tarde</option>
+                        <option value="Noite" {% if request.GET.periodo == "Noite" %}selected{% endif %}>Noite</option>
+                    </select>
+                </div>
+                <div class="col-12 mt-3">
+                    <button type="submit" class="btn btn-secondary">Filtrar</button>
+                    <a href="{% url 'notas:avaliacao_list' %}" class="btn btn-outline-secondary">Limpar filtros</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Avaliações -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if avaliacoes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Disciplina</th>
+                                <th>Turma</th>
+                                <th>Tipo</th>
+                                <th>Data</th>
+                                <th>Período</th>
+                                <th>Peso</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for avaliacao in avaliacoes %}
+                                <tr>
+                                    <td>{{ avaliacao.nome }}</td>
+                                    <td>{{ avaliacao.disciplina.nome }}</td>
+                                    <td>{{ avaliacao.turma.nome }}</td>
+                                    <td>{{ avaliacao.tipo }}</td>
+                                    <td>{{ avaliacao.data|date:"d/m/Y" }}</td>
+                                    <td>{{ avaliacao.periodo }}</td>
+                                    <td>{{ avaliacao.peso }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'notas:avaliacao_update' avaliacao.id %}" class="btn btn-outline-primary" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'notas:avaliacao_delete' avaliacao.id %}" class="btn btn-outline-danger" title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            <a href="{% url 'notas:lancar_notas' avaliacao.id %}" class="btn btn-outline-success" title="Lançar Notas">
+                                                <i class="fas fa-clipboard-check"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                {% if is_paginated %}
+                <nav aria-label="Paginação" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Primeira">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Próxima">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Última">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i> Nenhuma avaliação encontrada.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

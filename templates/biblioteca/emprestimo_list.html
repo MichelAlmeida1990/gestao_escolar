@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Empréstimos - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3">
+                        <i class="fas fa-handshake text-primary"></i> Empréstimos
+                    </h1>
+                    <p class="text-muted mb-0">Gerencie os empréstimos de livros</p>
+                </div>
+                <div>
+                    <a href="{% url 'biblioteca:realizar_emprestimo' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Novo Empréstimo
+                    </a>
+                    <a href="{% url 'biblioteca:index' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Nome do usuário ou livro">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">Todos</option>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if value == status_selecionado %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="tipo_usuario" class="form-label">Tipo de Usuário</label>
+                            <select class="form-select" id="tipo_usuario" name="tipo_usuario">
+                                <option value="">Todos</option>
+                                {% for value, label in tipo_usuario_choices %}
+                                    <option value="{{ value }}" {% if value == tipo_usuario_selecionado %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            <input type="date" class="form-control" id="data_inicio" name="data_inicio" 
+                                   value="{{ data_inicio }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            <input type="date" class="form-control" id="data_fim" name="data_fim" 
+                                   value="{{ data_fim }}">
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de Empréstimos -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> Lista de Empréstimos
+                        <span class="badge bg-secondary ms-2">{{ emprestimos|length }} encontrados</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if emprestimos %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Livro</th>
+                                        <th>Usuário</th>
+                                        <th>Data Empréstimo</th>
+                                        <th>Data Prevista</th>
+                                        <th>Data Devolução</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for emprestimo in emprestimos %}
+                                    <tr {% if emprestimo.esta_atrasado %}class="table-warning"{% endif %}>
+                                        <td>
+                                            <strong>{{ emprestimo.livro.titulo }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ emprestimo.livro.codigo_barras }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ emprestimo.nome_usuario }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                {% if emprestimo.tipo_usuario == 'aluno' %}
+                                                    Aluno - {{ emprestimo.aluno.matricula }}
+                                                {% else %}
+                                                    Professor - {{ emprestimo.professor.registro_profissional }}
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                        <td>{{ emprestimo.data_emprestimo|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            {{ emprestimo.data_prevista_devolucao|date:"d/m/Y" }}
+                                            {% if emprestimo.esta_atrasado %}
+                                                <br><small class="text-danger">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    {{ emprestimo.dias_atraso }} dias de atraso
+                                                </small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if emprestimo.data_devolucao %}
+                                                {{ emprestimo.data_devolucao|date:"d/m/Y H:i" }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if emprestimo.status == 'ativo' %}
+                                                <span class="badge bg-success">Ativo</span>
+                                            {% elif emprestimo.status == 'devolvido' %}
+                                                <span class="badge bg-info">Devolvido</span>
+                                            {% elif emprestimo.status == 'atrasado' %}
+                                                <span class="badge bg-danger">Atrasado</span>
+                                            {% elif emprestimo.status == 'renovado' %}
+                                                <span class="badge bg-warning">Renovado</span>
+                                            {% elif emprestimo.status == 'perdido' %}
+                                                <span class="badge bg-dark">Perdido</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'biblioteca:emprestimo_detail' emprestimo.pk %}" 
+                                                   class="btn btn-sm btn-outline-info" title="Ver Detalhes">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if emprestimo.status == 'ativo' %}
+                                                    <a href="{% url 'biblioteca:devolver_livro' emprestimo.id %}" 
+                                                       class="btn btn-sm btn-outline-success" title="Devolver">
+                                                        <i class="fas fa-undo"></i>
+                                                    </a>
+                                                    {% if emprestimo.pode_renovar %}
+                                                        <a href="{% url 'biblioteca:renovar_emprestimo' emprestimo.id %}" 
+                                                           class="btn btn-sm btn-outline-warning" title="Renovar">
+                                                            <i class="fas fa-sync"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                            <nav aria-label="Paginação dos empréstimos">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}{% if tipo_usuario_selecionado %}&tipo_usuario={{ tipo_usuario_selecionado }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}">Primeira</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}{% if tipo_usuario_selecionado %}&tipo_usuario={{ tipo_usuario_selecionado }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}">Anterior</a>
+                                        </li>
+                                    {% endif %}
+
+                                    <li class="page-item active">
+                                        <span class="page-link">
+                                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                        </span>
+                                    </li>
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}{% if tipo_usuario_selecionado %}&tipo_usuario={{ tipo_usuario_selecionado }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}">Próxima</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}{% if tipo_usuario_selecionado %}&tipo_usuario={{ tipo_usuario_selecionado }}{% endif %}{% if data_inicio %}&data_inicio={{ data_inicio }}{% endif %}{% if data_fim %}&data_fim={{ data_fim }}{% endif %}">Última</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum empréstimo encontrado</h5>
+                            <p class="text-muted">
+                                {% if search or status_selecionado or tipo_usuario_selecionado or data_inicio or data_fim %}
+                                    Tente ajustar os filtros de busca.
+                                {% else %}
+                                    Que tal realizar o primeiro empréstimo?
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'biblioteca:realizar_emprestimo' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Novo Empréstimo
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.table-warning {
+    --bs-table-bg: #fff3cd;
+}
+</style>
+{% endblock %}

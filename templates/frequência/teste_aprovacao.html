@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Teste de Aprovação{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Teste de Aprovação de Justificativas</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-body">
+            <h5>Justificativas Pendentes:</h5>
+            {% for j in justificativas %}
+                <div class="border p-3 mb-3">
+                    <p><strong>ID:</strong> {{ j.id }}</p>
+                    <p><strong>Aluno:</strong> {{ j.registro_frequencia.aluno.nome }}</p>
+                    <p><strong>Data da Falta:</strong> {{ j.registro_frequencia.data }}</p>
+                    <p><strong>Motivo:</strong> {{ j.motivo|truncatechars:100 }}</p>
+                    <p><strong>Status:</strong> 
+                        {% if j.data_aprovacao %}
+                            {% if j.aprovado %}Aprovado{% else %}Reprovado{% endif %} em {{ j.data_aprovacao }}
+                        {% else %}
+                            Pendente
+                        {% endif %}
+                    </p>
+                    
+                    {% if not j.data_aprovacao %}
+                        <div class="btn-group">
+                            <a href="{% url 'frequencia:aprovar_justificativa' j.id %}?acao=aprovar" 
+                               class="btn btn-success btn-sm"
+                               onclick="return confirm('Aprovar justificativa de {{ j.registro_frequencia.aluno.nome }}?')">
+                                Aprovar
+                            </a>
+                            <a href="{% url 'frequencia:aprovar_justificativa' j.id %}?acao=reprovar" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Reprovar justificativa de {{ j.registro_frequencia.aluno.nome }}?')">
+                                Reprovar
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <a href="{% url 'frequencia:justificativas_pendentes' %}" class="btn btn-secondary mt-3">
+        Voltar para Lista Oficial
+    </a>
+</div>
+{% endblock %} 

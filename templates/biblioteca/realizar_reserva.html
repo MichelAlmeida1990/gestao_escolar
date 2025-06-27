@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Realizar Reserva - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3">
+                        <i class="fas fa-bookmark text-warning"></i> Realizar Reserva
+                    </h1>
+                    <p class="text-muted mb-0">Reserve um livro que está emprestado</p>
+                </div>
+                <div>
+                    <a href="{% url 'biblioteca:index' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-bookmark text-warning"></i> Nova Reserva
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" id="reservaForm">
+                                {% csrf_token %}
+                                
+                                <!-- Seleção de Livro -->
+                                <div class="mb-4">
+                                    <label for="livro_id" class="form-label fw-semibold">
+                                        <i class="fas fa-book text-primary"></i> Livro para Reserva *
+                                    </label>
+                                    <select class="form-select" id="livro_id" name="livro_id" required>
+                                        <option value="">Selecione um livro...</option>
+                                        {% for livro in livros %}
+                                            <option value="{{ livro.id }}" 
+                                                    {% if livro.id|stringformat:"s" == livro_selecionado %}selected{% endif %}>
+                                                {{ livro.titulo }} - {{ livro.codigo_barras }}
+                                                ({{ livro.get_status_display }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">
+                                        <small class="text-muted">
+                                            Apenas livros que estão emprestados podem ser reservados
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Tipo de Usuário -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-users text-primary"></i> Tipo de Usuário *
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="tipo_usuario" 
+                                                       id="tipo_aluno" value="aluno" checked>
+                                                <label class="form-check-label" for="tipo_aluno">
+                                                    <i class="fas fa-graduation-cap text-success"></i> Aluno
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="tipo_usuario" 
+                                                       id="tipo_professor" value="professor">
+                                                <label class="form-check-label" for="tipo_professor">
+                                                    <i class="fas fa-chalkboard-teacher text-info"></i> Professor
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Seleção de Usuário -->
+                                <div class="mb-4">
+                                    <!-- Alunos -->
+                                    <div id="div_alunos" class="usuario-group">
+                                        <label for="aluno_id" class="form-label fw-semibold">
+                                            <i class="fas fa-graduation-cap text-success"></i> Aluno *
+                                        </label>
+                                        <select class="form-select" id="aluno_id" name="usuario_id">
+                                            <option value="">Selecione um aluno...</option>
+                                            {% for aluno in alunos %}
+                                                <option value="{{ aluno.id }}">
+                                                    {{ aluno.nome }} - {{ aluno.matricula }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <!-- Professores -->
+                                    <div id="div_professores" class="usuario-group" style="display: none;">
+                                        <label for="professor_id" class="form-label fw-semibold">
+                                            <i class="fas fa-chalkboard-teacher text-info"></i> Professor *
+                                        </label>
+                                        <select class="form-select" id="professor_id" name="usuario_id">
+                                            <option value="">Selecione um professor...</option>
+                                            {% for professor in professores %}
+                                                <option value="{{ professor.id }}">
+                                                    {{ professor.nome }} - {{ professor.disciplina|default:"N/A" }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Observações -->
+                                <div class="mb-4">
+                                    <label for="observacoes" class="form-label fw-semibold">
+                                        <i class="fas fa-comment text-primary"></i> Observações
+                                    </label>
+                                    <textarea class="form-control" id="observacoes" name="observacoes" 
+                                              rows="3" placeholder="Observações sobre a reserva (opcional)"></textarea>
+                                    <div class="form-text">
+                                        <small class="text-muted">
+                                            Informações adicionais sobre a reserva
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Informações sobre Reserva -->
+                                <div class="alert alert-info">
+                                    <h6 class="fw-semibold mb-2">
+                                        <i class="fas fa-info-circle"></i> Informações sobre Reservas
+                                    </h6>
+                                    <ul class="mb-0 small">
+                                        <li>Você será notificado quando o livro estiver disponível</li>
+                                        <li>A reserva tem validade limitada após a notificação</li>
+                                        <li>Reservas podem ser canceladas a qualquer momento</li>
+                                        <li>Livros disponíveis podem ser emprestados diretamente</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Botões -->
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'biblioteca:index' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-bookmark"></i> Confirmar Reserva
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoAlunoRadio = document.getElementById('tipo_aluno');
+    const tipoProfessorRadio = document.getElementById('tipo_professor');
+    const divAlunos = document.getElementById('div_alunos');
+    const divProfessores = document.getElementById('div_professores');
+    const alunoSelect = document.getElementById('aluno_id');
+    const professorSelect = document.getElementById('professor_id');
+    
+    function alternarTipoUsuario() {
+        if (tipoAlunoRadio.checked) {
+            divAlunos.style.display = 'block';
+            divProfessores.style.display = 'none';
+            alunoSelect.required = true;
+            professorSelect.required = false;
+            alunoSelect.name = 'usuario_id';
+            professorSelect.name = '';
+        } else {
+            divAlunos.style.display = 'none';
+            divProfessores.style.display = 'block';
+            alunoSelect.required = false;
+            professorSelect.required = true;
+            alunoSelect.name = '';
+            professorSelect.name = 'usuario_id';
+        }
+    }
+    
+    tipoAlunoRadio.addEventListener('change', alternarTipoUsuario);
+    tipoProfessorRadio.addEventListener('change', alternarTipoUsuario);
+    
+    // Configuração inicial
+    alternarTipoUsuario();
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+}
+
+.form-check-input:checked + .form-check-label {
+    color: var(--bs-primary);
+    font-weight: 500;
+}
+
+.alert {
+    border-radius: 0.5rem;
+}
+
+.usuario-group {
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}

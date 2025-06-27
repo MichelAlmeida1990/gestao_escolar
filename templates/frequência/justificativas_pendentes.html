@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Justificativas Pendentes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hidden form for CSRF token -->
+    <form style="display: none;">
+        {% csrf_token %}
+    </form>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-clipboard-check text-warning"></i>
+            Justificativas Pendentes
+        </h1>
+        <a href="{% url 'frequencia:index' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Justificativas Aguardando Aprovação
+                        <span class="badge bg-dark ms-2">{{ justificativas.count }}</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if justificativas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Data da Falta</th>
+                                        <th>Aluno</th>
+                                        <th>Turma</th>
+                                        <th>Disciplina</th>
+                                        <th>Motivo</th>
+                                        <th>Data da Justificativa</th>
+                                        <th>Documento</th>
+                                        <th class="text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for justificativa in justificativas %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ justificativa.registro_frequencia.data|date:"d/m/Y" }}</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ justificativa.registro_frequencia.aluno.nome }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ justificativa.registro_frequencia.aluno.matricula }}</small>
+                                            </div>
+                                        </td>
+                                        <td>{{ justificativa.registro_frequencia.turma.nome }}</td>
+                                        <td>{{ justificativa.registro_frequencia.disciplina.nome }}</td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ justificativa.motivo }}">
+                                                {{ justificativa.motivo|truncatechars:80 }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{ justificativa.data_justificativa|date:"d/m/Y H:i" }}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if justificativa.documento %}
+                                                <a href="{{ justificativa.documento.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-file-alt"></i> Ver
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">
+                                                    <i class="fas fa-times"></i> Sem documento
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <!-- Botão direto para aprovar (fallback) -->
+                                                <a href="{% url 'frequencia:aprovar_justificativa' justificativa.id %}?acao=aprovar" 
+                                                   class="btn btn-sm btn-success" 
+                                                   title="Aprovar justificativa"
+                                                   onclick="return confirm('Aprovar esta justificativa?')">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                                <!-- Botão direto para reprovar (fallback) -->
+                                                <a href="{% url 'frequencia:aprovar_justificativa' justificativa.id %}?acao=reprovar" 
+                                                   class="btn btn-sm btn-danger" 
+                                                   title="Reprovar justificativa"
+                                                   onclick="return confirm('Reprovar esta justificativa?')">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                                <!-- Botões JavaScript originais (escondidos por padrão) -->
+                                                <button type="button" class="btn btn-sm btn-success d-none" 
+                                                        onclick="aprovarJustificativa({{ justificativa.id }}, 'aprovar')"
+                                                        title="Aprovar justificativa - JS">
+                                                    <i class="fas fa-check"></i> JS
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger d-none" 
+                                                        onclick="aprovarJustificativa({{ justificativa.id }}, 'reprovar')"
+                                                        title="Reprovar justificativa - JS">
+                                                    <i class="fas fa-times"></i> JS
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-info" 
+                                                        onclick="verDetalhes({{ justificativa.id }})"
+                                                        title="Ver detalhes">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h4 class="text-muted">Nenhuma justificativa pendente</h4>
+                            <p class="text-muted">Todas as justificativas foram processadas.</p>
+                            <a href="{% url 'frequencia:index' %}" class="btn btn-primary">
+                                <i class="fas fa-home"></i> Voltar ao Início
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">
+                        <i class="fas fa-clock"></i> Pendentes
+                    </h5>
+                    <h3 class="text-warning">{{ justificativas.count }}</h3>
+                    <p class="card-text">Aguardando aprovação</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">
+                        <i class="fas fa-check"></i> Aprovadas Hoje
+                    </h5>
+                    <h3 class="text-success">0</h3>
+                    <p class="card-text">Justificativas aprovadas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-danger">
+                        <i class="fas fa-times"></i> Reprovadas Hoje
+                    </h5>
+                    <h3 class="text-danger">0</h3>
+                    <p class="card-text">Justificativas reprovadas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalhes da justificativa -->
+<div class="modal fade" id="detalhesModal" tabindex="-1" aria-labelledby="detalhesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalhesModalLabel">Detalhes da Justificativa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="detalhesConteudo">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação para aprovação/reprovação -->
+<div class="modal fade" id="confirmacaoModal" tabindex="-1" aria-labelledby="confirmacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmacaoModalLabel">Confirmar Ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmacaoConteudo">
+                <!-- Conteúdo será preenchido via JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmarAcao">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let justificativaAtual = null;
+let acaoAtual = null;
+
+function aprovarJustificativa(justificativaId, acao) {
+    justificativaAtual = justificativaId;
+    acaoAtual = acao;
+    
+    const titulo = acao === 'aprovar' ? 'Aprovar Justificativa' : 'Reprovar Justificativa';
+    const texto = acao === 'aprovar' 
+        ? 'Tem certeza que deseja aprovar esta justificativa? A falta será marcada como justificada.'
+        : 'Tem certeza que deseja reprovar esta justificativa? A falta permanecerá como não justificada.';
+    
+    document.getElementById('confirmacaoModalLabel').textContent = titulo;
+    document.getElementById('confirmacaoConteudo').innerHTML = `
+        <p>${texto}</p>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Esta ação não pode ser desfeita.
+        </div>
+    `;
+    
+    const botaoConfirmar = document.getElementById('confirmarAcao');
+    botaoConfirmar.className = acao === 'aprovar' ? 'btn btn-success' : 'btn btn-danger';
+    botaoConfirmar.textContent = acao === 'aprovar' ? 'Aprovar' : 'Reprovar';
+    
+    new bootstrap.Modal(document.getElementById('confirmacaoModal')).show();
+}
+
+function verDetalhes(justificativaId) {
+    const modal = new bootstrap.Modal(document.getElementById('detalhesModal'));
+    modal.show();
+    
+    // Simular carregamento de detalhes via AJAX
+    setTimeout(() => {
+        document.getElementById('detalhesConteudo').innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Informações da Falta</h6>
+                    <p><strong>Data:</strong> 24/06/2025</p>
+                    <p><strong>Aluno:</strong> João Silva</p>
+                    <p><strong>Turma:</strong> 1º Ano A</p>
+                    <p><strong>Disciplina:</strong> Matemática</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Justificativa</h6>
+                    <p><strong>Data da Justificativa:</strong> 25/06/2025</p>
+                    <p><strong>Motivo:</strong> Consulta médica de emergência</p>
+                    <p><strong>Documento:</strong> <a href="#" target="_blank">Ver atestado médico</a></p>
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+document.getElementById('confirmarAcao').addEventListener('click', function() {
+    if (justificativaAtual && acaoAtual) {
+        try {
+            // Criar formulário para submissão
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/frequencia/aprovar-justificativa/${justificativaAtual}/`;
+            
+            // CSRF Token
+            const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfTokenElement) {
+                alert('Erro: Token CSRF não encontrado. Por favor, recarregue a página.');
+                return;
+            }
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfTokenElement.value;
+            form.appendChild(csrfInput);
+            
+            // Ação
+            const acaoInput = document.createElement('input');
+            acaoInput.type = 'hidden';
+            acaoInput.name = 'acao';
+            acaoInput.value = acaoAtual;
+            form.appendChild(acaoInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+            
+            // Fechar modal
+            const modalElement = document.getElementById('confirmacaoModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        } catch (error) {
+            console.error('Erro ao processar aprovação:', error);
+            alert('Erro ao processar a solicitação. Por favor, tente novamente.');
+        }
+    }
+});
+</script>
+{% endblock %} 

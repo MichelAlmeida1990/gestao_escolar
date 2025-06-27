@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard de Frequência{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-tachometer-alt text-primary"></i>
+            Dashboard de Frequência
+        </h1>
+        <a href="{% url 'frequencia:index' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Estatísticas Gerais -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">
+                        <i class="fas fa-calendar-day"></i> Hoje
+                    </h5>
+                    <h3 class="text-primary">{{ stats.registros_hoje }}</h3>
+                    <p class="card-text">Registros de frequência</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">
+                        <i class="fas fa-check"></i> Presenças
+                    </h5>
+                    <h3 class="text-success">{{ stats.presencas_hoje }}</h3>
+                    <p class="card-text">Presenças hoje</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-danger">
+                        <i class="fas fa-times"></i> Faltas
+                    </h5>
+                    <h3 class="text-danger">{{ stats.faltas_hoje }}</h3>
+                    <p class="card-text">Faltas hoje</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">
+                        <i class="fas fa-clock"></i> Pendentes
+                    </h5>
+                    <h3 class="text-warning">{{ stats.justificativas_pendentes }}</h3>
+                    <p class="card-text">Justificativas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frequência por Turma -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Frequência por Turma (Últimos 7 dias)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if frequencia_turmas %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Turma</th>
+                                        <th>Total de Registros</th>
+                                        <th>Presenças</th>
+                                        <th>Percentual</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for freq in frequencia_turmas %}
+                                    <tr>
+                                        <td><strong>{{ freq.turma }}</strong></td>
+                                        <td>{{ freq.total }}</td>
+                                        <td>{{ freq.presencas }}</td>
+                                        <td>
+                                            <div class="progress" style="width: 100px;">
+                                                <div class="progress-bar 
+                                                    {% if freq.percentual >= 90 %}bg-success
+                                                    {% elif freq.percentual >= 75 %}bg-warning
+                                                    {% else %}bg-danger{% endif %}"
+                                                     role="progressbar" 
+                                                     style="width: {{ freq.percentual }}%"
+                                                     aria-valuenow="{{ freq.percentual }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                    {{ freq.percentual }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if freq.percentual >= 90 %}
+                                                <span class="badge bg-success">Excelente</span>
+                                            {% elif freq.percentual >= 75 %}
+                                                <span class="badge bg-warning">Atenção</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Crítico</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Nenhum dado disponível</h4>
+                            <p class="text-muted">Não há registros de frequência nos últimos 7 dias.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Ações Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'frequencia:registrar_frequencia' %}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-plus d-block mb-2"></i>
+                                Registrar Frequência
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'frequencia:registro_list' %}" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-list d-block mb-2"></i>
+                                Ver Registros
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'frequencia:relatorio_frequencia' %}" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-chart-bar d-block mb-2"></i>
+                                Relatórios
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {% if user.is_staff %}
+                            <a href="{% url 'frequencia:justificativas_pendentes' %}" class="btn btn-warning btn-lg w-100">
+                                <i class="fas fa-exclamation-triangle d-block mb-2"></i>
+                                Justificativas
+                                {% if stats.justificativas_pendentes > 0 %}
+                                    <span class="badge bg-dark">{{ stats.justificativas_pendentes }}</span>
+                                {% endif %}
+                            </a>
+                            {% else %}
+                            <button class="btn btn-secondary btn-lg w-100" disabled>
+                                <i class="fas fa-lock d-block mb-2"></i>
+                                Acesso Restrito
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

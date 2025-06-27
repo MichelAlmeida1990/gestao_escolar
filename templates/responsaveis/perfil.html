@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Perfil do Responsável{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Informações do Perfil -->
+        <div class="col-md-4">
+            <div class="card card-profile">
+                <div class="card-header text-center border-0 pt-0 pt-lg-2 pb-4 pb-lg-3">
+                    <div class="d-flex justify-content-center">
+                        <div class="profile-image-container mt-5">
+                            <div class="profile-image-placeholder bg-gradient-primary text-white d-flex align-items-center justify-content-center">
+                                {{ responsavel.nome_completo|slice:":1" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="text-center mt-4">
+                        <h5>{{ responsavel.nome_completo }}</h5>
+                        <div class="h6 font-weight-300">
+                            <i class="ni location_pin mr-2"></i>{{ responsavel.cidade }}, {{ responsavel.estado }}
+                        </div>
+                        <div class="h6 mt-2">
+                            <i class="ni business_briefcase-24 mr-2"></i>{{ responsavel.profissao }}
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <div class="card-profile-stats d-flex justify-content-center">
+                                <div>
+                                    <span class="heading">{{ relacoes.count }}</span>
+                                    <span class="description">Dependentes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações Detalhadas e Edição -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="d-flex align-items-center">
+                        <h6 class="mb-0">Informações do Perfil</h6>
+                        <button class="btn btn-sm btn-primary ms-auto" id="editProfileBtn">
+                            <i class="fa fa-edit me-2"></i> Editar Perfil
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Visualização de Informações -->
+                    <div id="profileInfo">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-uppercase text-sm">Informações Pessoais</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item border-0 ps-0 pt-0"><strong>Nome Completo:</strong> {{ responsavel.nome_completo }}</li>
+                                    <li class="list-group-item border-0 ps-0"><strong>CPF:</strong> {{ responsavel.cpf }}</li>
+                                    <li class="list-group-item border-0 ps-0"><strong>Data de Nascimento:</strong> {{ responsavel.data_nascimento|date:"d/m/Y" }}</li>
+                                    <li class="list-group-item border-0 ps-0"><strong>Profissão:</strong> {{ responsavel.profissao }}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-uppercase text-sm">Informações de Contato</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item border-0 ps-0 pt-0"><strong>Email:</strong> {{ responsavel.usuario.email }}</li>
+                                    <li class="list-group-item border-0 ps-0"><strong>Telefone:</strong> {{ responsavel.telefone }}</li>
+                                    <li class="list-group-item border-0 ps-0"><strong>Celular:</strong> {{ responsavel.celular }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="text-uppercase text-sm">Endereço</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item border-0 ps-0 pt-0">
+                                        {{ responsavel.endereco }}, {{ responsavel.numero }}
+                                        {% if responsavel.complemento %} - {{ responsavel.complemento }}{% endif %}
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0">{{ responsavel.bairro }}, {{ responsavel.cidade }} - {{ responsavel.estado }}</li>
+                                    <li class="list-group-item border-0 ps-0"><strong>CEP:</strong> {{ responsavel.cep }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de Edição (inicialmente oculto) -->
+                    <div id="profileEditForm" style="display: none;">
+                        <form method="post" action="{% url 'responsaveis:perfil' %}">
+                            {% csrf_token %}
+                            <!-- Aqui você pode adicionar os campos do formulário -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nome_completo">Nome Completo</label>
+                                        <input type="text" class="form-control" id="nome_completo" name="nome_completo" value="{{ responsavel.nome_completo }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ responsavel.usuario.email }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Adicione mais campos conforme necessário -->
+                            
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="button" class="btn btn-secondary me-2" id="cancelEditBtn">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alunos Vinculados -->
+            <div class="card mt-4">
+                <div class="card-header pb-0">
+                    <h6>Alunos Vinculados</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Aluno</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Turma</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Parentesco</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for relacao in relacoes %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ relacao.aluno.nome_completo }}</h6>
+                                                <p class="text-xs text-secondary mb-0">{{ relacao.aluno.matricula }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">{{ relacao.aluno.turma_atual.nome }}</p>
+                                        <p class="text-xs text-secondary mb-0">{{ relacao.aluno.turma_atual.ano_letivo }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">{{ relacao.get_parentesco_display }}</p>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <a href="{% url 'responsaveis:boletim' relacao.aluno.id %}" class="btn btn-sm btn-info">
+                                            <i class="fa fa-file-text"></i> Boletim
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-3">Nenhum aluno vinculado ao seu cadastro.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileInfo = document.getElementById('profileInfo');
+        const profileEditForm = document.getElementById('profileEditForm');
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+        // Alternar entre visualização e edição
+        editProfileBtn.addEventListener('click', function() {
+            profileInfo.style.display = 'none';
+            profileEditForm.style.display = 'block';
+        });
+
+        cancelEditBtn.addEventListener('click', function() {
+            profileInfo.style.display = 'block';
+            profileEditForm.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

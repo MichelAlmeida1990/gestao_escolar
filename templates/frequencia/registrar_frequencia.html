@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Frequência{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .aluno-row {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .aluno-row:hover {
+        background: #e9ecef;
+    }
+    
+    .aluno-info {
+        flex: 1;
+        padding-right: 1rem;
+    }
+    
+    .aluno-nome {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .aluno-detalhes {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .status-options {
+        display: flex;
+        gap: 1rem;
+        margin-right: 1rem;
+    }
+    
+    .status-radio {
+        position: relative;
+    }
+    
+    .status-radio input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .status-radio label {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid #dee2e6;
+        background: white;
+        font-size: 0.9rem;
+    }
+    
+    .status-radio input[type="radio"]:checked + label {
+        font-weight: 600;
+        color: white;
+    }
+    
+    .status-radio input[type="radio"]:checked + label.presente {
+        background: #28a745;
+        border-color: #28a745;
+    }
+    
+    .status-radio input[type="radio"]:checked + label.ausente {
+        background: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .status-radio input[type="radio"]:checked + label.atrasado {
+        background: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+    }
+    
+    .status-radio input[type="radio"]:checked + label.justificado {
+        background: #6f42c1;
+        border-color: #6f42c1;
+    }
+    
+    .obs-input {
+        min-width: 200px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .obs-input:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        outline: 0;
+    }
+    
+    .batch-actions {
+        background: #e3f2fd;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-batch {
+        margin: 0.25rem;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-user-check text-primary me-3"></i>
+            Registrar Frequência
+        </h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'frequencia:index' %}">Frequência</a></li>
+                <li class="breadcrumb-item active">Registrar</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <!-- Formulário de Seleção -->
+    <div class="form-section">
+        <h3 class="mb-4">
+            <i class="fas fa-filter text-primary me-2"></i>
+            Selecionar Turma e Disciplina
+        </h3>
+        
+        <form method="get" id="form-selecao">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="turma" class="form-label">Turma</label>
+                    <select name="turma" id="turma" class="form-select" required>
+                        <option value="">Selecione uma turma</option>
+                        {% for turma in turmas %}
+                        <option value="{{ turma.id }}" {% if turma.id|stringformat:"s" == turma_selecionada %}selected{% endif %}>
+                            {{ turma.nome }} - {{ turma.serie }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="disciplina" class="form-label">Disciplina</label>
+                    <select name="disciplina" id="disciplina" class="form-select" required>
+                        <option value="">Selecione uma disciplina</option>
+                        {% for disciplina in disciplinas %}
+                        <option value="{{ disciplina.id }}" {% if disciplina.id|stringformat:"s" == disciplina_selecionada %}selected{% endif %}>
+                            {{ disciplina.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="data" class="form-label">Data</label>
+                    <input type="date" name="data" id="data" class="form-control" value="{{ data_selecionada }}" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary d-block w-100">
+                        <i class="fas fa-search me-2"></i>
+                        Carregar Alunos
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Lista de Alunos -->
+    {% if alunos_data %}
+    <div class="form-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>
+                <i class="fas fa-users text-primary me-2"></i>
+                Frequência da Turma: {{ turma.nome }}
+            </h3>
+            <span class="badge bg-info fs-6">{{ disciplina.nome }}</span>
+        </div>
+        
+        <!-- Ações em Lote -->
+        <div class="batch-actions">
+            <h6 class="mb-3">
+                <i class="fas fa-magic me-2"></i>
+                Ações em Lote
+            </h6>
+            <button type="button" class="btn btn-success btn-batch" onclick="marcarTodos('presente')">
+                <i class="fas fa-check me-1"></i>
+                Todos Presentes
+            </button>
+            <button type="button" class="btn btn-danger btn-batch" onclick="marcarTodos('ausente')">
+                <i class="fas fa-times me-1"></i>
+                Todos Ausentes
+            </button>
+            <button type="button" class="btn btn-warning btn-batch" onclick="marcarTodos('atrasado')">
+                <i class="fas fa-clock me-1"></i>
+                Todos Atrasados
+            </button>
+        </div>
+        
+        <form method="post" id="form-frequencia">
+            {% csrf_token %}
+            <input type="hidden" name="turma_id" value="{{ turma.id }}">
+            <input type="hidden" name="disciplina_id" value="{{ disciplina.id }}">
+            <input type="hidden" name="data" value="{{ data_selecionada }}">
+            
+            {% for aluno_data in alunos_data %}
+            <div class="aluno-row">
+                <div class="aluno-info">
+                    <div class="aluno-nome">{{ aluno_data.aluno.nome }}</div>
+                    <div class="aluno-detalhes">
+                        Matrícula: {{ aluno_data.aluno.matricula }}
+                        {% if aluno_data.aluno.data_nascimento %}
+                        | Nascimento: {{ aluno_data.aluno.data_nascimento|date:"d/m/Y" }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="status-options">
+                    {% for value, label in status_choices %}
+                    <div class="status-radio">
+                        <input type="radio" 
+                               name="status_{{ aluno_data.aluno.id }}" 
+                               value="{{ value }}" 
+                               id="status_{{ aluno_data.aluno.id }}_{{ value }}"
+                               {% if aluno_data.status == value %}checked{% endif %}>
+                        <label for="status_{{ aluno_data.aluno.id }}_{{ value }}" class="{{ value }}">
+                            {% if value == 'presente' %}
+                                <i class="fas fa-check me-1"></i>
+                            {% elif value == 'ausente' %}
+                                <i class="fas fa-times me-1"></i>
+                            {% elif value == 'atrasado' %}
+                                <i class="fas fa-clock me-1"></i>
+                            {% elif value == 'justificado' %}
+                                <i class="fas fa-file-alt me-1"></i>
+                            {% endif %}
+                            {{ label }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div>
+                    <input type="text" 
+                           name="obs_{{ aluno_data.aluno.id }}" 
+                           class="obs-input" 
+                           placeholder="Observações"
+                           value="{{ aluno_data.observacoes }}">
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-2"></i>
+                    Salvar Frequência
+                </button>
+                <a href="{% url 'frequencia:index' %}" class="btn btn-secondary btn-lg ms-3">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Voltar
+                </a>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Função para marcar todos os alunos com o mesmo status
+function marcarTodos(status) {
+    const radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
+    radios.forEach(radio => {
+        radio.checked = true;
+    });
+}
+
+// Carregar disciplinas baseadas na turma selecionada
+document.getElementById('turma').addEventListener('change', function() {
+    const turmaId = this.value;
+    const disciplinaSelect = document.getElementById('disciplina');
+    
+    if (!turmaId) {
+        disciplinaSelect.innerHTML = '<option value="">Selecione uma disciplina</option>';
+        return;
+    }
+    
+    // Buscar disciplinas da turma via API
+    fetch(`{% url 'frequencia:api_disciplinas_turma' %}?turma_id=${turmaId}`)
+        .then(response => response.json())
+        .then(data => {
+            disciplinaSelect.innerHTML = '<option value="">Selecione uma disciplina</option>';
+            data.disciplinas.forEach(disciplina => {
+                const option = document.createElement('option');
+                option.value = disciplina.id;
+                option.textContent = disciplina.nome;
+                disciplinaSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar disciplinas:', error);
+        });
+});
+
+// Validação antes do envio
+document.getElementById('form-frequencia')?.addEventListener('submit', function(e) {
+    const checkedRadios = document.querySelectorAll('input[type="radio"]:checked');
+    const totalAlunos = document.querySelectorAll('.aluno-row').length;
+    
+    if (checkedRadios.length < totalAlunos) {
+        e.preventDefault();
+        alert('Por favor, marque o status de todos os alunos antes de salvar.');
+    }
+});
+
+// Definir data atual se não estiver preenchida
+document.addEventListener('DOMContentLoaded', function() {
+    const dataInput = document.getElementById('data');
+    if (!dataInput.value) {
+        const hoje = new Date().toISOString().split('T')[0];
+        dataInput.value = hoje;
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ titulo }}</h1>
+        <a href="{% url 'turmas:turma_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome da Turma</label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.nome.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.serie.id_for_label }}" class="form-label">Série</label>
+                        {{ form.serie }}
+                        {% if form.serie.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.serie.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.turno.id_for_label }}" class="form-label">Turno</label>
+                        {{ form.turno }}
+                        {% if form.turno.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.turno.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.ano_letivo.id_for_label }}" class="form-label">Ano Letivo</label>
+                        {{ form.ano_letivo }}
+                        {% if form.ano_letivo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.ano_letivo.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.capacidade.id_for_label }}" class="form-label">Capacidade</label>
+                        {{ form.capacidade }}
+                        {% if form.capacidade.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.capacidade.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> {{ botao }}
+                    </button>
+                    <a href="{% url 'turmas:turma_list' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

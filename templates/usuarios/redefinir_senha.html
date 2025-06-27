@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Redefinir Senha - Sistema de Gestão Escolar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reset-section {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .reset-container {
+        max-width: 500px;
+        width: 100%;
+    }
+    
+    .reset-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+    
+    .reset-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--success), var(--info));
+    }
+    
+    .reset-header {
+        background: linear-gradient(135deg, rgba(56, 176, 0, 0.05), rgba(76, 201, 240, 0.05));
+        padding: 3rem 2.5rem 2rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .reset-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(45deg, var(--success), var(--info));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .reset-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .reset-subtitle {
+        color: #5a6a7e;
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+    
+    .reset-body {
+        padding: 2.5rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-control {
+        border-radius: 12px;
+        padding: 1rem 1rem 1rem 3rem;
+        height: calc(3.5rem + 2px);
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(56, 176, 0, 0.15);
+        border-color: var(--success);
+        outline: none;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 10;
+    }
+    
+    .form-floating label {
+        padding: 1rem 1rem 1rem 3rem;
+        font-weight: 500;
+        color: #6c757d;
+    }
+    
+    .btn-reset {
+        background: linear-gradient(45deg, var(--success), var(--info));
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(56, 176, 0, 0.4);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-reset:hover {
+        background: linear-gradient(45deg, var(--info), var(--success));
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(56, 176, 0, 0.5);
+    }
+    
+    .btn-reset i {
+        margin-right: 0.5rem;
+    }
+    
+    .password-requirements {
+        background: linear-gradient(45deg, rgba(56, 176, 0, 0.05), rgba(76, 201, 240, 0.05));
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--success);
+    }
+    
+    .password-requirements h6 {
+        color: var(--success);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+    
+    .password-requirements ul {
+        margin: 0;
+        padding-left: 1.25rem;
+    }
+    
+    .password-requirements li {
+        color: #5a6a7e;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .reset-footer {
+        text-align: center;
+        padding: 2rem 2.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: linear-gradient(135deg, rgba(56, 176, 0, 0.03), rgba(76, 201, 240, 0.03));
+    }
+    
+    .reset-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .reset-footer a:hover {
+        color: var(--accent);
+        text-decoration: underline;
+    }
+    
+    .form-errors {
+        background: linear-gradient(45deg, #ffe6e6, #ffcccc);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #dc3545;
+    }
+    
+    .form-errors ul {
+        margin: 0;
+        padding-left: 1.25rem;
+    }
+    
+    .form-errors li {
+        color: #721c24;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="reset-section">
+    <div class="container">
+        <div class="reset-container">
+            <div class="reset-card">
+                <div class="reset-header">
+                    <div class="reset-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="reset-title">
+                        Nova Senha
+                    </div>
+                    <div class="reset-subtitle">
+                        Defina uma nova senha segura para sua conta
+                    </div>
+                </div>
+                
+                <div class="reset-body">
+                    {% if form.errors %}
+                    <div class="form-errors">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Corrija os erros abaixo:</h6>
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="password-requirements">
+                        <h6><i class="fas fa-shield-alt me-2"></i>Requisitos da Senha</h6>
+                        <ul>
+                            <li>Pelo menos 8 caracteres</li>
+                            <li>Inclua letras maiúsculas e minúsculas</li>
+                            <li>Inclua pelo menos um número</li>
+                            <li>Inclua pelo menos um caractere especial</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-floating">
+                            <i class="fas fa-key input-icon"></i>
+                            {{ form.new_password1 }}
+                            <label for="id_new_password1">{{ form.new_password1.label }}</label>
+                        </div>
+                        
+                        <div class="form-floating">
+                            <i class="fas fa-check-circle input-icon"></i>
+                            {{ form.new_password2 }}
+                            <label for="id_new_password2">{{ form.new_password2.label }}</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-reset">
+                            <i class="fas fa-save"></i>
+                            Salvar Nova Senha
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="reset-footer">
+                    <p class="mb-2">Lembrou sua senha?</p>
+                    <a href="{% url 'usuarios:login' %}">
+                        <i class="fas fa-arrow-left me-1"></i>Voltar ao login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const password1 = document.getElementById('id_new_password1');
+    const password2 = document.getElementById('id_new_password2');
+    
+    // Validação em tempo real
+    function validatePassword() {
+        const password = password1.value;
+        const requirements = document.querySelectorAll('.password-requirements li');
+        
+        // Reset styles
+        requirements.forEach(req => {
+            req.style.color = '#5a6a7e';
+            req.querySelector('i')?.remove();
+        });
+        
+        // Check length
+        if (password.length >= 8) {
+            requirements[0].style.color = '#38b000';
+            requirements[0].innerHTML = '<i class="fas fa-check me-1"></i>' + requirements[0].textContent;
+        }
+        
+        // Check uppercase and lowercase
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+            requirements[1].style.color = '#38b000';
+            requirements[1].innerHTML = '<i class="fas fa-check me-1"></i>' + requirements[1].textContent;
+        }
+        
+        // Check numbers
+        if (/\d/.test(password)) {
+            requirements[2].style.color = '#38b000';
+            requirements[2].innerHTML = '<i class="fas fa-check me-1"></i>' + requirements[2].textContent;
+        }
+        
+        // Check special characters
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+            requirements[3].style.color = '#38b000';
+            requirements[3].innerHTML = '<i class="fas fa-check me-1"></i>' + requirements[3].textContent;
+        }
+    }
+    
+    function checkPasswordMatch() {
+        if (password1.value && password2.value) {
+            if (password1.value === password2.value) {
+                password2.style.borderColor = '#38b000';
+            } else {
+                password2.style.borderColor = '#dc3545';
+            }
+        }
+    }
+    
+    password1.addEventListener('input', validatePassword);
+    password2.addEventListener('input', checkPasswordMatch);
+});
+</script>
+{% endblock %} 

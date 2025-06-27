@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard do Responsável{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h6>Bem-vindo(a), {{ responsavel.nome_completo }}</h6>
+                </div>
+                <div class="card-body">
+                    <p>Este é o seu painel de controle como responsável. Aqui você pode acompanhar o desempenho escolar dos seus dependentes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for dados in dados_alunos %}
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-8">
+                            <h5>{{ dados.aluno.nome_completo }}</h5>
+                            <p class="text-sm mb-0">
+                                <i class="fa fa-graduation-cap text-success" aria-hidden="true"></i>
+                                <span class="font-weight-bold ms-1">{{ dados.turma.nome }}</span>
+                            </p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <a href="{% url 'responsaveis:boletim' dados.aluno.id %}" class="btn btn-sm btn-primary">Ver Boletim</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-body border card-plain border-radius-lg mb-3">
+                                <h6 class="mb-0">Média Geral</h6>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-{% if dados.media_geral >= 7 %}success{% elif dados.media_geral >= 5 %}warning{% else %}danger{% endif %} text-gradient text-lg me-2">
+                                        {{ dados.media_geral }}
+                                    </span>
+                                    <span class="text-sm">
+                                        {% if dados.media_geral >= 7 %}
+                                            <i class="fa fa-arrow-up text-success"></i> Bom desempenho
+                                        {% elif dados.media_geral >= 5 %}
+                                            <i class="fa fa-minus text-warning"></i> Atenção necessária
+                                        {% else %}
+                                            <i class="fa fa-arrow-down text-danger"></i> Precisa melhorar
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card card-body border card-plain border-radius-lg mb-3">
+                                <h6 class="mb-0">Faltas</h6>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-{% if dados.faltas <= 5 %}success{% elif dados.faltas <= 15 %}warning{% else %}danger{% endif %} text-gradient text-lg me-2">
+                                        {{ dados.faltas }}
+                                    </span>
+                                    <span class="text-sm">
+                                        {% if dados.faltas <= 5 %}
+                                            <i class="fa fa-check text-success"></i> Frequência adequada
+                                        {% elif dados.faltas <= 15 %}
+                                            <i class="fa fa-exclamation text-warning"></i> Atenção às faltas
+                                        {% else %}
+                                            <i class="fa fa-exclamation-triangle text-danger"></i> Muitas faltas
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4">Notas Recentes</h6>
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Disciplina</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Avaliação</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nota</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for nota in dados.notas_recentes %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ nota.disciplina.nome }}</h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">{{ nota.descricao }}</p>
+                                        <p class="text-xs text-secondary mb-0">{{ nota.get_bimestre_display }}</p>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="badge badge-sm bg-gradient-{% if nota.valor >= 7 %}success{% elif nota.valor >= 5 %}warning{% else %}danger{% endif %}">
+                                            {{ nota.valor }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">{{ nota.data_lancamento|date:"d/m/Y" }}</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-3">Nenhuma nota registrada recentemente.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <h5>Nenhum aluno vinculado ao seu cadastro</h5>
+                    <p>Entre em contato com a secretaria da escola para verificar esta situação.</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Código JavaScript adicional se necessário
+</script>
+{% endblock %}

@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações Financeiras{% endblock %}
+
+{% block extra_css %}
+<style>
+    .config-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .config-section h5 {
+        color: #495057;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .config-info {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .preview-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .required-field::after {
+        content: ' *';
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">
+            <i class="fas fa-cog"></i> Configurações Financeiras
+        </h1>
+        <a href="{% url 'financeiro:index' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <form method="post" class="row">
+        {% csrf_token %}
+        
+        <div class="col-md-8">
+            <!-- Configurações de Mensalidade -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-money-bill-wave"></i> Configurações de Mensalidade</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="valor_padrao_mensalidade" class="form-label">
+                                Valor Padrão da Mensalidade *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" 
+                                       name="valor_padrao_mensalidade" 
+                                       id="valor_padrao_mensalidade" 
+                                       class="form-control" 
+                                       step="0.01" 
+                                       min="0" 
+                                       value="{{ config.valor_padrao_mensalidade }}" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dia_vencimento_mensalidade" class="form-label">
+                                Dia de Vencimento *
+                            </label>
+                            <input type="number" 
+                                   name="dia_vencimento_mensalidade" 
+                                   id="dia_vencimento_mensalidade" 
+                                   class="form-control" 
+                                   min="1" 
+                                   max="31" 
+                                   value="{{ config.dia_vencimento_mensalidade }}" 
+                                   required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configurações de Juros e Multas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-percentage"></i> Juros e Multas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="percentual_juros_mes" class="form-label">Juros por Mês (%)</label>
+                            <input type="number" 
+                                   name="percentual_juros_mes" 
+                                   id="percentual_juros_mes" 
+                                   class="form-control" 
+                                   step="0.01" 
+                                   min="0" 
+                                   value="{{ config.percentual_juros_mes }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="valor_multa_atraso" class="form-label">Multa por Atraso (R$)</label>
+                            <input type="number" 
+                                   name="valor_multa_atraso" 
+                                   id="valor_multa_atraso" 
+                                   class="form-control" 
+                                   step="0.01" 
+                                   min="0" 
+                                   value="{{ config.valor_multa_atraso }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="dias_carencia_juros" class="form-label">Carência para Juros (dias)</label>
+                            <input type="number" 
+                                   name="dias_carencia_juros" 
+                                   id="dias_carencia_juros" 
+                                   class="form-control" 
+                                   min="0" 
+                                   value="{{ config.dias_carencia_juros }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configurações de Descontos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-tags"></i> Descontos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="percentual_desconto_pontualidade" class="form-label">
+                                Desconto por Pontualidade (%)
+                            </label>
+                            <input type="number" 
+                                   name="percentual_desconto_pontualidade" 
+                                   id="percentual_desconto_pontualidade" 
+                                   class="form-control" 
+                                   step="0.01" 
+                                   min="0" 
+                                   value="{{ config.percentual_desconto_pontualidade }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="percentual_desconto_irmao" class="form-label">
+                                Desconto para Irmãos (%)
+                            </label>
+                            <input type="number" 
+                                   name="percentual_desconto_irmao" 
+                                   id="percentual_desconto_irmao" 
+                                   class="form-control" 
+                                   step="0.01" 
+                                   min="0" 
+                                   value="{{ config.percentual_desconto_irmao }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações da Escola -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-building"></i> Informações da Escola</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="nome_escola" class="form-label">Nome da Escola *</label>
+                            <input type="text" 
+                                   name="nome_escola" 
+                                   id="nome_escola" 
+                                   class="form-control" 
+                                   value="{{ config.nome_escola }}" 
+                                   required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cnpj_escola" class="form-label">CNPJ da Escola</label>
+                            <input type="text" 
+                                   name="cnpj_escola" 
+                                   id="cnpj_escola" 
+                                   class="form-control" 
+                                   value="{{ config.cnpj_escola }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <label for="endereco_escola" class="form-label">Endereço da Escola</label>
+                            <textarea name="endereco_escola" 
+                                      id="endereco_escola" 
+                                      class="form-control" 
+                                      rows="3">{{ config.endereco_escola }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'financeiro:relatorios' %}" class="btn btn-outline-info">
+                    <i class="fas fa-chart-line"></i> Ver Relatórios
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Configurações
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> Informações</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>As configurações afetam apenas novas mensalidades</li>
+                        <li>Mensalidades já geradas não são alteradas automaticamente</li>
+                        <li>Descontos podem ser aplicados manualmente</li>
+                        <li>Juros são calculados automaticamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Atualizar preview em tempo real
+    function atualizarPreview() {
+        const valor = parseFloat(document.getElementById('valor_padrao_mensalidade').value) || 0;
+        const vencimento = document.getElementById('dia_vencimento_mensalidade').value;
+        const descontoPontualidade = parseFloat(document.getElementById('percentual_desconto_pontualidade').value) || 0;
+        const juros = parseFloat(document.getElementById('percentual_juros_mes').value) || 0;
+        const multa = parseFloat(document.getElementById('valor_multa_atraso').value) || 0;
+        
+        // Calcular valores
+        const valorComDesconto = valor * (1 - descontoPontualidade / 100);
+        const valorComMultaJuros = valor + multa + (valor * juros / 100);
+        
+        // Atualizar preview
+        document.getElementById('preview-valor').textContent = valor.toFixed(2);
+        document.getElementById('preview-vencimento').textContent = vencimento;
+        document.getElementById('preview-desconto').textContent = valorComDesconto.toFixed(2);
+        document.getElementById('preview-multa').textContent = valorComMultaJuros.toFixed(2);
+    }
+
+    // Adicionar listeners para atualização em tempo real
+    document.getElementById('valor_padrao_mensalidade').addEventListener('input', atualizarPreview);
+    document.getElementById('dia_vencimento_mensalidade').addEventListener('input', atualizarPreview);
+    document.getElementById('percentual_desconto_pontualidade').addEventListener('input', atualizarPreview);
+    document.getElementById('percentual_juros_mes').addEventListener('input', atualizarPreview);
+    document.getElementById('valor_multa_atraso').addEventListener('input', atualizarPreview);
+
+    // Máscara para CNPJ
+    document.getElementById('cnpj_escola').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length <= 14) {
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+            e.target.value = value;
+        }
+    });
+
+    // Validação de formulário
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const valor = parseFloat(document.getElementById('valor_padrao_mensalidade').value);
+        const dia = parseInt(document.getElementById('dia_vencimento_mensalidade').value);
+        
+        if (valor <= 0) {
+            e.preventDefault();
+            alert('O valor da mensalidade deve ser maior que zero.');
+            document.getElementById('valor_padrao_mensalidade').focus();
+            return false;
+        }
+        
+        if (dia < 1 || dia > 31) {
+            e.preventDefault();
+            alert('O dia de vencimento deve estar entre 1 e 31.');
+            document.getElementById('dia_vencimento_mensalidade').focus();
+            return false;
+        }
+    });
+
+    // Inicializar preview
+    atualizarPreview();
+</script>
+{% endblock %} 

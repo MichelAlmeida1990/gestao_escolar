@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações da Biblioteca{% endblock %}
+
+{% block extra_css %}
+<style>
+    .config-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .config-section h5 {
+        color: #495057;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .config-info {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .config-info .fas {
+        color: #2196f3;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    <i class="fas fa-cogs"></i> Configurações da Biblioteca
+                </h1>
+                <a href="{% url 'biblioteca:index' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="config-info">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-info-circle fa-lg"></i>
+            <div>
+                <strong>Informações Importantes:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Estas configurações afetam todo o sistema de biblioteca</li>
+                    <li>Alterações são aplicadas imediatamente para novos empréstimos</li>
+                    <li>Empréstimos ativos mantêm as configurações originais</li>
+                    <li>Apenas administradores podem alterar estas configurações</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Configurações de Empréstimo -->
+                <div class="config-section">
+                    <h5><i class="fas fa-handshake"></i> Configurações de Empréstimo</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="dias_emprestimo_aluno" class="form-label">
+                                    Dias de Empréstimo - Aluno
+                                </label>
+                                <input type="number" class="form-control" id="dias_emprestimo_aluno" 
+                                       name="dias_emprestimo_aluno" value="{{ config.dias_emprestimo_aluno }}" 
+                                       min="1" max="90" required>
+                                <div class="help-text">Prazo padrão para devolução de livros por alunos</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="dias_emprestimo_professor" class="form-label">
+                                    Dias de Empréstimo - Professor
+                                </label>
+                                <input type="number" class="form-control" id="dias_emprestimo_professor" 
+                                       name="dias_emprestimo_professor" value="{{ config.dias_emprestimo_professor }}" 
+                                       min="1" max="180" required>
+                                <div class="help-text">Prazo padrão para devolução de livros por professores</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="max_renovacoes" class="form-label">
+                                    Máximo de Renovações
+                                </label>
+                                <input type="number" class="form-control" id="max_renovacoes" 
+                                       name="max_renovacoes" value="{{ config.max_renovacoes }}" 
+                                       min="0" max="10" required>
+                                <div class="help-text">Número máximo de renovações permitidas</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="max_livros_aluno" class="form-label">
+                                    Máximo de Livros - Aluno
+                                </label>
+                                <input type="number" class="form-control" id="max_livros_aluno" 
+                                       name="max_livros_aluno" value="{{ config.max_livros_aluno }}" 
+                                       min="1" max="20" required>
+                                <div class="help-text">Limite de livros emprestados simultaneamente</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="max_livros_professor" class="form-label">
+                                    Máximo de Livros - Professor
+                                </label>
+                                <input type="number" class="form-control" id="max_livros_professor" 
+                                       name="max_livros_professor" value="{{ config.max_livros_professor }}" 
+                                       min="1" max="50" required>
+                                <div class="help-text">Limite de livros emprestados simultaneamente</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configurações de Multas e Reservas -->
+                <div class="config-section">
+                    <h5><i class="fas fa-money-bill-wave"></i> Multas e Reservas</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="valor_multa_dia" class="form-label">
+                                    Valor da Multa por Dia (R$)
+                                </label>
+                                <input type="number" class="form-control" id="valor_multa_dia" 
+                                       name="valor_multa_dia" value="{{ config.valor_multa_dia }}" 
+                                       min="0" step="0.01" required>
+                                <div class="help-text">Valor cobrado por dia de atraso na devolução</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="dias_reserva" class="form-label">
+                                    Dias de Validade da Reserva
+                                </label>
+                                <input type="number" class="form-control" id="dias_reserva" 
+                                       name="dias_reserva" value="{{ config.dias_reserva }}" 
+                                       min="1" max="30" required>
+                                <div class="help-text">Tempo que uma reserva permanece ativa</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações da Biblioteca -->
+                <div class="config-section">
+                    <h5><i class="fas fa-building"></i> Informações da Biblioteca</h5>
+                    <div class="form-group mb-3">
+                        <label for="nome_biblioteca" class="form-label">
+                            Nome da Biblioteca
+                        </label>
+                        <input type="text" class="form-control" id="nome_biblioteca" 
+                               name="nome_biblioteca" value="{{ config.nome_biblioteca }}" 
+                               maxlength="200" required>
+                        <div class="help-text">Nome oficial da biblioteca</div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="endereco" class="form-label">
+                            Endereço
+                        </label>
+                        <textarea class="form-control" id="endereco" name="endereco" 
+                                  rows="3">{{ config.endereco }}</textarea>
+                        <div class="help-text">Endereço completo da biblioteca</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="telefone" class="form-label">
+                                    Telefone
+                                </label>
+                                <input type="text" class="form-control" id="telefone" 
+                                       name="telefone" value="{{ config.telefone }}" 
+                                       maxlength="20">
+                                <div class="help-text">Telefone para contato</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="email" class="form-label">
+                                    E-mail
+                                </label>
+                                <input type="email" class="form-control" id="email" 
+                                       name="email" value="{{ config.email }}">
+                                <div class="help-text">E-mail oficial da biblioteca</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="horario_funcionamento" class="form-label">
+                            Horário de Funcionamento
+                        </label>
+                        <textarea class="form-control" id="horario_funcionamento" 
+                                  name="horario_funcionamento" rows="4">{{ config.horario_funcionamento }}</textarea>
+                        <div class="help-text">Horários de funcionamento da biblioteca</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Ações -->
+                <div class="config-section">
+                    <h5><i class="fas fa-save"></i> Ações</h5>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar Configurações
+                        </button>
+                        <a href="{% url 'biblioteca:index' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Atenção:</strong> As alterações serão aplicadas imediatamente após salvar.
+                    </div>
+                </div>
+
+                <!-- Estatísticas Atuais -->
+                <div class="config-section">
+                    <h5><i class="fas fa-chart-bar"></i> Configurações Atuais</h5>
+                    <div class="small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Empréstimo Aluno:</span>
+                            <strong>{{ config.dias_emprestimo_aluno }} dias</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Empréstimo Professor:</span>
+                            <strong>{{ config.dias_emprestimo_professor }} dias</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Máx. Renovações:</span>
+                            <strong>{{ config.max_renovacoes }}x</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Limite Aluno:</span>
+                            <strong>{{ config.max_livros_aluno }} livros</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Limite Professor:</span>
+                            <strong>{{ config.max_livros_professor }} livros</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Multa/dia:</span>
+                            <strong>R$ {{ config.valor_multa_dia }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Validade Reserva:</span>
+                            <strong>{{ config.dias_reserva }} dias</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dicas de Uso -->
+                <div class="config-section">
+                    <h5><i class="fas fa-lightbulb"></i> Dicas</h5>
+                    <div class="small text-muted">
+                        <ul class="ps-3 mb-0">
+                            <li>Defina prazos adequados para cada tipo de usuário</li>
+                            <li>Configure multas proporcionais ao valor dos livros</li>
+                            <li>Ajuste limites conforme a demanda da biblioteca</li>
+                            <li>Mantenha as informações de contato atualizadas</li>
+                            <li>Revise as configurações periodicamente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Máscara para telefone
+    $('#telefone').on('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length <= 11) {
+            value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            if (value.length < 14) {
+                value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+            }
+        }
+        this.value = value;
+    });
+    
+    // Validações
+    $('#dias_emprestimo_aluno, #dias_emprestimo_professor').on('change', function() {
+        const diasAluno = parseInt($('#dias_emprestimo_aluno').val());
+        const diasProfessor = parseInt($('#dias_emprestimo_professor').val());
+        
+        if (diasAluno >= diasProfessor) {
+            alert('O prazo para professores deve ser maior que o prazo para alunos.');
+            $('#dias_emprestimo_professor').val(diasAluno + 7);
+        }
+    });
+    
+    $('#max_livros_aluno, #max_livros_professor').on('change', function() {
+        const maxAluno = parseInt($('#max_livros_aluno').val());
+        const maxProfessor = parseInt($('#max_livros_professor').val());
+        
+        if (maxAluno >= maxProfessor) {
+            alert('O limite para professores deve ser maior que o limite para alunos.');
+            $('#max_livros_professor').val(maxAluno + 2);
+        }
+    });
+    
+    // Confirmação antes de salvar
+    $('form').on('submit', function(e) {
+        const confirmacao = confirm('Tem certeza que deseja salvar estas configurações? As alterações serão aplicadas imediatamente.');
+        if (!confirmacao) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Boletim do Aluno{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2">Boletim Escolar</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'notas:selecionar_aluno_boletim' %}">Boletins</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Boletim do Aluno</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Informações do Aluno -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Informações do Aluno</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>{{ aluno.nome }}</h4>
+                    <p class="mb-1"><strong>Matrícula:</strong> {{ aluno.matricula }}</p>
+                    <p class="mb-1"><strong>Turma:</strong> {% if turma_atual %}{{ turma_atual.nome }}{% else %}Não matriculado{% endif %}</p>
+                    <p class="mb-1"><strong>Ano Letivo:</strong> {% if turma_atual %}{{ turma_atual.ano_letivo }}{% else %}-{% endif %}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'alunos:aluno_detail' aluno.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-user"></i> Ver Perfil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seleção de Período -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Período</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="periodo" class="form-label">Selecione o período:</label>
+                    <select name="periodo" id="periodo" class="form-select" onchange="this.form.submit()">
+                        <option value="1" {% if periodo == '1' %}selected{% endif %}>1º Bimestre</option>
+                        <option value="2" {% if periodo == '2' %}selected{% endif %}>2º Bimestre</option>
+                        <option value="3" {% if periodo == '3' %}selected{% endif %}>3º Bimestre</option>
+                        <option value="4" {% if periodo == '4' %}selected{% endif %}>4º Bimestre</option>
+                        <option value="todos" {% if periodo == 'todos' %}selected{% endif %}>Todos os Bimestres</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Boletim -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Boletim Escolar - {% if periodo != 'todos' %}{{ periodo }}º Bimestre{% else %}Anual{% endif %}</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+        </div>
+        <div class="card-body">
+            {% if notas_por_disciplina %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Disciplina</th>
+                                {% if periodo == 'todos' %}
+                                    <th class="text-center">1º Bimestre</th>
+                                    <th class="text-center">2º Bimestre</th>
+                                    <th class="text-center">3º Bimestre</th>
+                                    <th class="text-center">4º Bimestre</th>
+                                    <th class="text-center">Média Final</th>
+                                    <th class="text-center">Situação</th>
+                                {% else %}
+                                    <th class="text-center">Avaliação 1</th>
+                                    <th class="text-center">Avaliação 2</th>
+                                    <th class="text-center">Avaliação 3</th>
+                                    <th class="text-center">Média</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for disciplina, dados in notas_por_disciplina.items %}
+                                <tr>
+                                    <td>{{ disciplina }}</td>
+                                    
+                                    {% if periodo == 'todos' %}
+                                        <td class="text-center {% if dados.medias.1 < 6 %}text-danger{% endif %}">
+                                            {{ dados.medias.1|floatformat:1|default:"-" }}
+                                        </td>
+                                        <td class="text-center {% if dados.medias.2 < 6 %}text-danger{% endif %}">
+                                            {{ dados.medias.2|floatformat:1|default:"-" }}
+                                        </td>
+                                        <td class="text-center {% if dados.medias.3 < 6 %}text-danger{% endif %}">
+                                            {{ dados.medias.3|floatformat:1|default:"-" }}
+                                        </td>
+                                        <td class="text-center {% if dados.medias.4 < 6 %}text-danger{% endif %}">
+                                            {{ dados.medias.4|floatformat:1|default:"-" }}
+                                        </td>
+                                        <td class="text-center {% if dados.media_final < 6 %}text-danger{% elif dados.media_final >= 8 %}text-success{% endif %}">
+                                            <strong>{{ dados.media_final|floatformat:1|default:"-" }}</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if dados.media_final >= 6 %}
+                                                <span class="badge bg-success">Aprovado</span>
+                                            {% elif dados.media_final >= 4 %}
+                                                <span class="badge bg-warning text-dark">Recuperação</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Reprovado</span>
+                                            {% endif %}
+                                        </td>
+                                    {% else %}
+                                        {% for avaliacao in dados.avaliacoes %}
+                                            <td class="text-center {% if avaliacao.valor < 6 %}text-danger{% endif %}">
+                                                {{ avaliacao.valor|floatformat:1|default:"-" }}
+                                            </td>
+                                        {% endfor %}
+                                        
+                                        {% with restantes=3|add:"-"|add:dados.avaliacoes|length %}
+                                            {% for _ in "x"|ljust:restantes %}
+                                                <td class="text-center">-</td>
+                                            {% endfor %}
+                                        {% endwith %}
+                                        
+                                        <td class="text-center {% if dados.media < 6 %}text-danger{% elif dados.media >= 8 %}text-success{% endif %}">
+                                            <strong>{{ dados.media|floatformat:1|default:"-" }}</strong>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if periodo == 'todos' %}
+                    <!-- Resumo anual -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Resumo Anual</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 border-primary">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Média Geral</h5>
+                                            <h2 class="{% if media_geral < 6 %}text-danger{% elif media_geral >= 8 %}text-success{% endif %}">
+                                                {{ media_geral|floatformat:1 }}
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 border-primary">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Frequência</h5>
+                                            <h2 class="{% if frequencia < 75 %}text-danger{% else %}text-success{% endif %}">
+                                                {{ frequencia|floatformat:1 }}%
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 border-primary">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Situação Final</h5>
+                                            <h2>
+                                                {% if media_geral >= 6 and frequencia >= 75 %}
+                                                    <span class="badge bg-success">Aprovado</span>
+                                                {% elif media_geral >= 4 and frequencia >= 75 %}
+                                                    <span class="badge bg-warning text-dark">Recuperação</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Reprovado</span>
+                                                {% endif %}
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i> Nenhuma nota registrada para este aluno no período selecionado.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Observações -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Observações</h5>
+        </div>
+        <div class="card-body">
+            <ul class="mb-0">
+                <li>As notas são calculadas em uma escala de 0 a 10.</li>
+                <li>Média mínima para aprovação: 6,0</li>
+                <li>Média entre 4,0 e 5,9: Recuperação</li>
+                <li>Média abaixo de 4,0: Reprovação</li>
+                <li>Frequência mínima obrigatória: 75%</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .navbar, .breadcrumb, form, .btn, footer {
+            display: none !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+        }
+    }
+</style>
+{% endblock %}

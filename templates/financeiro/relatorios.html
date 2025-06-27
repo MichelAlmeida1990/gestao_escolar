@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatórios Financeiros{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .report-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 2rem;
+    }
+    
+    .table-financial {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    <i class="fas fa-chart-line"></i> Relatórios Financeiros
+                </h1>
+                <a href="{% url 'financeiro:index' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo Anual -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4>Resumo por Ano</h4>
+        </div>
+        {% for dados in dados_anuais %}
+        <div class="col-md-4">
+            <div class="report-card">
+                <div class="report-number">{{ dados.ano }}</div>
+                <div class="mb-2">
+                    <strong>Total:</strong> R$ {{ dados.valor_total|floatformat:2 }}
+                </div>
+                <div class="mb-2">
+                    <strong>Recebido:</strong> R$ {{ dados.valor_pago|floatformat:2 }}
+                </div>
+                <div>
+                    <strong>Taxa de Pagamento:</strong> {{ dados.percentual_pagamento|floatformat:1 }}%
+                </div>
+                <div class="progress mt-2">
+                    <div class="progress-bar bg-success" 
+                         style="width: {{ dados.percentual_pagamento }}%"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Relatório Mensal do Ano Atual -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-calendar"></i> Receitas Mensais - {{ ano_atual }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="receitasMensaisChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-pie-chart"></i> Distribuição Anual</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="distribuicaoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela Detalhada -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-table"></i> Detalhamento Mensal - {{ ano_atual }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Mês</th>
+                                    <th>Valor Total</th>
+                                    <th>Valor Recebido</th>
+                                    <th>Valor Pendente</th>
+                                    <th>% Pagamento</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dados in dados_mensais %}
+                                                                 <tr>
+                                     <td>
+                                         <strong>
+                                         {% if dados.mes == 1 %}Janeiro
+                                         {% elif dados.mes == 2 %}Fevereiro
+                                         {% elif dados.mes == 3 %}Março
+                                         {% elif dados.mes == 4 %}Abril
+                                         {% elif dados.mes == 5 %}Maio
+                                         {% elif dados.mes == 6 %}Junho
+                                         {% elif dados.mes == 7 %}Julho
+                                         {% elif dados.mes == 8 %}Agosto
+                                         {% elif dados.mes == 9 %}Setembro
+                                         {% elif dados.mes == 10 %}Outubro
+                                         {% elif dados.mes == 11 %}Novembro
+                                         {% elif dados.mes == 12 %}Dezembro
+                                         {% endif %}
+                                         </strong>
+                                     </td>
+                                    <td>R$ {{ dados.valor_total|floatformat:2 }}</td>
+                                    <td class="text-success">
+                                        R$ {{ dados.valor_pago|floatformat:2 }}
+                                    </td>
+                                                                         <td class="text-warning">
+                                         R$ {{ dados.valor_pendente|floatformat:2 }}
+                                     </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2">{{ dados.percentual_pagamento|floatformat:1 }}%</span>
+                                            <div class="progress flex-grow-1" style="height: 8px;">
+                                                <div class="progress-bar 
+                                                    {% if dados.percentual_pagamento >= 90 %}bg-success
+                                                    {% elif dados.percentual_pagamento >= 70 %}bg-warning
+                                                    {% else %}bg-danger{% endif %}"
+                                                     style="width: {{ dados.percentual_pagamento }}%">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if dados.percentual_pagamento >= 90 %}
+                                            <span class="badge bg-success">Excelente</span>
+                                        {% elif dados.percentual_pagamento >= 70 %}
+                                            <span class="badge bg-warning">Bom</span>
+                                        {% elif dados.percentual_pagamento >= 50 %}
+                                            <span class="badge bg-info">Regular</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Crítico</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'financeiro:mensalidade_list' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-list"></i><br>
+                                Ver Mensalidades
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'financeiro:gerar_mensalidades' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-plus"></i><br>
+                                Gerar Mensalidades
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <button onclick="window.print()" class="btn btn-outline-info w-100">
+                                <i class="fas fa-print"></i><br>
+                                Imprimir Relatório
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'financeiro:configuracoes' %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-cog"></i><br>
+                                Configurações
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Receitas Mensais
+    const ctx1 = document.getElementById('receitasMensaisChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for dados in dados_mensais %}
+                {% if dados.mes == 1 %}'Jan'
+                {% elif dados.mes == 2 %}'Fev'
+                {% elif dados.mes == 3 %}'Mar'
+                {% elif dados.mes == 4 %}'Abr'
+                {% elif dados.mes == 5 %}'Mai'
+                {% elif dados.mes == 6 %}'Jun'
+                {% elif dados.mes == 7 %}'Jul'
+                {% elif dados.mes == 8 %}'Ago'
+                {% elif dados.mes == 9 %}'Set'
+                {% elif dados.mes == 10 %}'Out'
+                {% elif dados.mes == 11 %}'Nov'
+                {% elif dados.mes == 12 %}'Dez'
+                {% endif %}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Valor Total',
+                data: [
+                    {% for dados in dados_mensais %}
+                    {{ dados.valor_total }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Valor Recebido',
+                data: [
+                    {% for dados in dados_mensais %}
+                    {{ dados.valor_pago }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                borderColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': R$ ' + context.parsed.y.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Distribuição por Ano
+    const ctx2 = document.getElementById('distribuicaoChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                {% for dados in dados_anuais %}
+                '{{ dados.ano }}'{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for dados in dados_anuais %}
+                    {{ dados.valor_pago }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.8)',
+                    'rgba(118, 75, 162, 0.8)',
+                    'rgba(255, 99, 132, 0.8)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

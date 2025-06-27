@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gerar Mensalidades{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .form-section h5 {
+        color: #495057;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-box {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .config-preview {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .required-field::after {
+        content: ' *';
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    <i class="fas fa-plus-circle"></i> Gerar Mensalidades
+                </h1>
+                <a href="{% url 'financeiro:index' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form method="post" id="formGerarMensalidades">
+                {% csrf_token %}
+                
+                <!-- Período de Referência -->
+                <div class="form-section">
+                    <h5><i class="fas fa-calendar"></i> Período de Referência</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="mes" class="form-label required-field">Mês</label>
+                            <select name="mes" id="mes" class="form-select" required>
+                                <option value="">Selecione o mês</option>
+                                {% for i in meses %}
+                                <option value="{{ i.0 }}">{{ i.1 }} - {{ i.0|date:"F" }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ano" class="form-label required-field">Ano</label>
+                            <select name="ano" id="ano" class="form-select" required>
+                                <option value="">Selecione o ano</option>
+                                {% for ano in anos %}
+                                <option value="{{ ano }}" {% if ano == 2025 %}selected{% endif %}>{{ ano }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configurações Financeiras -->
+                <div class="form-section">
+                    <h5><i class="fas fa-dollar-sign"></i> Configurações Financeiras</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="valor_base" class="form-label required-field">Valor Base da Mensalidade</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" 
+                                       name="valor_base" 
+                                       id="valor_base" 
+                                       class="form-control" 
+                                       step="0.01" 
+                                       min="0" 
+                                       value="{{ config.valor_padrao_mensalidade }}" 
+                                       required>
+                            </div>
+                            <small class="form-text text-muted">
+                                Valor padrão definido nas configurações: R$ {{ config.valor_padrao_mensalidade }}
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dia_vencimento" class="form-label required-field">Dia de Vencimento</label>
+                            <input type="number" 
+                                   name="dia_vencimento" 
+                                   id="dia_vencimento" 
+                                   class="form-control" 
+                                   min="1" 
+                                   max="31" 
+                                   value="{{ config.dia_vencimento_mensalidade }}" 
+                                   required>
+                            <small class="form-text text-muted">
+                                Dia padrão definido nas configurações: {{ config.dia_vencimento_mensalidade }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações Importantes -->
+                <div class="info-box">
+                    <h6><i class="fas fa-info-circle"></i> Informações Importantes</h6>
+                    <ul class="mb-0">
+                        <li>As mensalidades serão geradas apenas para alunos ativos</li>
+                        <li>Alunos sem turma não terão mensalidades geradas</li>
+                        <li>Se já existirem mensalidades para o período, elas não serão duplicadas</li>
+                        <li>O valor pode ser ajustado individualmente após a geração</li>
+                    </ul>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'financeiro:mensalidade_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list"></i> Ver Mensalidades
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus-circle"></i> Gerar Mensalidades
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Painel de Informações -->
+        <div class="col-md-4">
+            <div class="form-section">
+                <h5><i class="fas fa-info"></i> Configurações Atuais</h5>
+                
+                <div class="config-preview">
+                    <p><strong>Valor Padrão:</strong> R$ {{ config.valor_padrao_mensalidade|floatformat:2 }}</p>
+                    <p><strong>Dia de Vencimento:</strong> {{ config.dia_vencimento_mensalidade }}</p>
+                    <p><strong>Juros por Mês:</strong> {{ config.percentual_juros_mes }}%</p>
+                    <p><strong>Multa por Atraso:</strong> R$ {{ config.valor_multa_atraso|floatformat:2 }}</p>
+                    <p><strong>Carência de Juros:</strong> {{ config.dias_carencia_juros }} dias</p>
+                    <p class="mb-0"><strong>Desconto Pontualidade:</strong> {{ config.percentual_desconto_pontualidade }}%</p>
+                </div>
+
+                <a href="{% url 'financeiro:configuracoes' %}" class="btn btn-outline-info w-100">
+                    <i class="fas fa-cog"></i> Alterar Configurações
+                </a>
+            </div>
+
+            <!-- Estatísticas Rápidas -->
+            <div class="form-section">
+                <h5><i class="fas fa-chart-bar"></i> Estatísticas</h5>
+                
+                <div class="row text-center">
+                    <div class="col-12 mb-3">
+                        <div class="bg-primary text-white p-3 rounded">
+                            <h4 class="mb-0">{{ total_alunos_ativos|default:0 }}</h4>
+                            <small>Alunos Ativos</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="bg-success text-white p-2 rounded">
+                            <h6 class="mb-0">{{ total_turmas|default:0 }}</h6>
+                            <small>Turmas</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-info text-white p-2 rounded">
+                            <h6 class="mb-0">{{ mensalidades_mes_atual|default:0 }}</h6>
+                            <small>Mensalidades Este Mês</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Links Úteis -->
+            <div class="form-section">
+                <h5><i class="fas fa-external-link-alt"></i> Links Úteis</h5>
+                
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'alunos:aluno_list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users"></i> Gerenciar Alunos
+                    </a>
+                    <a href="{% url 'turmas:turma_list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-graduation-cap"></i> Gerenciar Turmas
+                    </a>
+                    <a href="{% url 'financeiro:relatorios' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chart-line"></i> Relatórios Financeiros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validação de formulário
+    document.getElementById('formGerarMensalidades').addEventListener('submit', function(e) {
+        const mes = document.getElementById('mes').value;
+        const ano = document.getElementById('ano').value;
+        const valor = document.getElementById('valor_base').value;
+        
+        if (!mes || !ano || !valor) {
+            e.preventDefault();
+            alert('Por favor, preencha todos os campos obrigatórios.');
+            return false;
+        }
+        
+        if (parseFloat(valor) <= 0) {
+            e.preventDefault();
+            alert('O valor da mensalidade deve ser maior que zero.');
+            return false;
+        }
+        
+        // Confirmação antes de gerar
+        const confirmacao = confirm(
+            `Confirma a geração de mensalidades para ${mes}/${ano} com valor de R$ ${parseFloat(valor).toFixed(2)}?`
+        );
+        
+        if (!confirmacao) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Atualizar preview quando valores mudarem
+    document.getElementById('valor_base').addEventListener('input', function() {
+        // Aqui podemos adicionar preview dinâmico se necessário
+    });
+
+    // Validação do dia de vencimento baseado no mês selecionado
+    document.getElementById('mes').addEventListener('change', function() {
+        const mes = parseInt(this.value);
+        const diaVencimento = document.getElementById('dia_vencimento');
+        
+        if (mes === 2) { // Fevereiro
+            diaVencimento.max = 28;
+            if (parseInt(diaVencimento.value) > 28) {
+                diaVencimento.value = 28;
+            }
+        } else if ([4, 6, 9, 11].includes(mes)) { // Meses com 30 dias
+            diaVencimento.max = 30;
+            if (parseInt(diaVencimento.value) > 30) {
+                diaVencimento.value = 30;
+            }
+        } else {
+            diaVencimento.max = 31;
+        }
+    });
+</script>
+{% endblock %} 

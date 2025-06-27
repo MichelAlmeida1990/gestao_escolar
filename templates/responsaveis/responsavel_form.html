@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if form.instance.id %}Editar Responsável{% else %}Novo Responsável{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'responsaveis:responsavel_list' %}">Responsáveis</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if form.instance.id %}Editar{% else %}Novo{% endif %}
+            </li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                {% if form.instance.id %}
+                    Editar Responsável
+                {% else %}
+                    Novo Responsável
+                {% endif %}
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome</label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.nome.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.cpf.id_for_label }}" class="form-label">CPF</label>
+                        {{ form.cpf }}
+                        {% if form.cpf.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.cpf.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.data_nascimento.id_for_label }}" class="form-label">Data de Nascimento</label>
+                        {{ form.data_nascimento }}
+                        {% if form.data_nascimento.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.data_nascimento.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
+                        {{ form.telefone }}
+                        {% if form.telefone.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.telefone.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.ativo.id_for_label }}" class="form-label">Status</label>
+                        <div class="form-check mt-2">
+                            {{ form.ativo }}
+                            <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                Ativo
+                            </label>
+                        </div>
+                        {% if form.ativo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.ativo.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.endereco.id_for_label }}" class="form-label">Endereço</label>
+                    {{ form.endereco }}
+                    {% if form.endereco.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.endereco.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'responsaveis:responsavel_list' %}" class="btn btn-secondary me-2">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>            
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar máscara de telefone
+    const telefoneField = document.getElementById('id_telefone');
+    if (telefoneField && typeof aplicarMascaraTelefone === 'function') {
+        aplicarMascaraTelefone(telefoneField);
+    }
+});
+</script>
+{% endblock %}

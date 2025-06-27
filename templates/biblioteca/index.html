@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sistema de Biblioteca{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 25px;
+        color: white;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .quick-action {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #333;
+        display: block;
+    }
+    .quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        text-decoration: none;
+        color: #333;
+    }
+    .quick-action i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: #667eea;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">
+                <i class="fas fa-book"></i> Sistema de Biblioteca
+            </h1>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ total_livros }}</div>
+                <div>Total de Livros</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="stats-number">{{ emprestimos_ativos }}</div>
+                <div>Empréstimos Ativos</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="stats-number">{{ reservas_ativas }}</div>
+                <div>Reservas Ativas</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <div class="stats-number">{{ emprestimos_vencidos }}</div>
+                <div>Empréstimos Vencidos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3">Ações Rápidas</h4>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'biblioteca:livro_list' %}" class="quick-action">
+                <i class="fas fa-book"></i>
+                <h6>Gerenciar Livros</h6>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'biblioteca:emprestimo_list' %}" class="quick-action">
+                <i class="fas fa-handshake"></i>
+                <h6>Empréstimos</h6>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'biblioteca:reserva_list' %}" class="quick-action">
+                <i class="fas fa-bookmark"></i>
+                <h6>Reservas</h6>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'biblioteca:autor_list' %}" class="quick-action">
+                <i class="fas fa-user-edit"></i>
+                <h6>Autores</h6>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'biblioteca:categoria_list' %}" class="quick-action">
+                <i class="fas fa-tags"></i>
+                <h6>Categorias</h6>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'biblioteca:relatorio_emprestimos' %}" class="quick-action">
+                <i class="fas fa-chart-bar"></i>
+                <h6>Relatórios</h6>
+            </a>
+        </div>
+    </div>
+
+    <!-- Empréstimos Recentes -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-history"></i> Empréstimos Recentes</h5>
+                </div>
+                <div class="card-body">
+                    {% if emprestimos_recentes %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Aluno</th>
+                                        <th>Livro</th>
+                                        <th>Data Empréstimo</th>
+                                        <th>Data Devolução</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for emprestimo in emprestimos_recentes %}
+                                    <tr>
+                                        <td>{{ emprestimo.aluno.nome }}</td>
+                                        <td>{{ emprestimo.livro.titulo }}</td>
+                                        <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                                        <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
+                                        <td>
+                                            {% if emprestimo.status == 'ativo' %}
+                                                <span class="badge badge-success">Ativo</span>
+                                            {% elif emprestimo.status == 'devolvido' %}
+                                                <span class="badge badge-info">Devolvido</span>
+                                            {% elif emprestimo.status == 'vencido' %}
+                                                <span class="badge badge-danger">Vencido</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhum empréstimo encontrado.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

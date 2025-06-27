@@ -22,7 +22,7 @@
                     <p><strong>Matrícula:</strong> {{ aluno.matricula }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Turma:</strong> {{ aluno.turma }}</p>
+                    <p><strong>Turma:</strong> {% if turma_atual %}{{ turma_atual.nome }}{% else %}Não matriculado{% endif %}</p>
                     <p><strong>Data de Nascimento:</strong> {{ aluno.data_nascimento|date:"d/m/Y" }}</p>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                             <tbody>
                                 {% for avaliacao in info.avaliacoes %}
                                     <tr>
-                                        <td>{{ avaliacao.titulo }}</td>
+                                        <td>{{ avaliacao.nome }}</td>
                                         <td>{{ avaliacao.data|date:"d/m/Y" }}</td>
                                         <td>{{ avaliacao.peso }}</td>
                                         <td>

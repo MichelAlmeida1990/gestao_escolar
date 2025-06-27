@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        color: white;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card.success {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stat-card.warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .quick-actions {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .action-btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        margin: 0.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .action-btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .turmas-recentes {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .turma-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.3s ease;
+    }
+    
+    .turma-item:hover {
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .turma-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-user-check text-primary me-3"></i>
+            Sistema de Frequência
+        </h1>
+        <p class="text-muted">Gerencie e acompanhe a frequência dos alunos</p>
+    </div>
+    
+    <!-- Estatísticas do Dia -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card info">
+                <div class="stat-number">{{ total_registros_hoje }}</div>
+                <div class="stat-label">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    Registros Hoje
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card success">
+                <div class="stat-number">{{ total_presentes_hoje }}</div>
+                <div class="stat-label">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Presenças
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card warning">
+                <div class="stat-number">{{ total_ausentes_hoje }}</div>
+                <div class="stat-label">
+                    <i class="fas fa-times-circle me-2"></i>
+                    Faltas
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number">
+                    {{ taxa_presenca }}%
+                </div>
+                <div class="stat-label">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Taxa de Presença
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ações Rápidas -->
+    <div class="quick-actions">
+        <h3 class="mb-4">
+            <i class="fas fa-bolt text-primary me-2"></i>
+            Ações Rápidas
+        </h3>
+        
+        <div class="text-center">
+            <a href="{% url 'frequencia:registrar_frequencia' %}" class="action-btn">
+                <i class="fas fa-plus"></i>
+                Registrar Frequência
+            </a>
+            
+            <a href="{% url 'frequencia:registro_list' %}" class="action-btn">
+                <i class="fas fa-list"></i>
+                Ver Registros
+            </a>
+            
+            <a href="{% url 'frequencia:relatorio_frequencia' %}" class="action-btn">
+                <i class="fas fa-chart-bar"></i>
+                Relatórios
+            </a>
+            
+            <a href="{% url 'frequencia:dashboard' %}" class="action-btn">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            
+            {% if user.is_staff %}
+            <a href="{% url 'frequencia:justificativas_pendentes' %}" class="action-btn">
+                <i class="fas fa-exclamation-triangle"></i>
+                Justificativas Pendentes
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Turmas Recentes -->
+    {% if turmas %}
+    <div class="turmas-recentes">
+        <h3 class="mb-4">
+            <i class="fas fa-users text-primary me-2"></i>
+            Turmas Disponíveis
+        </h3>
+        
+        {% for turma in turmas %}
+        <div class="turma-item">
+            <div>
+                <h5 class="mb-1">{{ turma.nome }}</h5>
+                <small class="text-muted">{{ turma.serie }} | {{ turma.alunos_matriculados.count }} alunos</small>
+            </div>
+            <div>
+                <a href="{% url 'frequencia:registrar_frequencia' %}?turma={{ turma.id }}" 
+                   class="btn btn-primary btn-sm">
+                    <i class="fas fa-user-check me-1"></i>
+                    Registrar Frequência
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% if turmas.count == 5 %}
+        <div class="text-center mt-3">
+            <a href="{% url 'turmas:turma_list' %}" class="btn btn-outline-primary">
+                Ver Todas as Turmas
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação de contadores
+    const counters = document.querySelectorAll('.stat-number');
+    
+    counters.forEach(counter => {
+        const target = parseInt(counter.textContent);
+        if (isNaN(target)) return;
+        
+        const increment = target / 50;
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            counter.textContent = Math.floor(current);
+        }, 20);
+    });
+});
+</script>
+{% endblock %} 

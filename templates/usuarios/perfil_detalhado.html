@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Perfil - Sistema de Gestão Escolar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-section {
+        padding: 2rem 0;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        margin: 0 auto 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+    
+    .profile-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-role {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    .nav-tabs {
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 500;
+        padding: 1rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background: none;
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
+    }
+    
+    .nav-tabs .nav-link:hover {
+        color: var(--primary);
+        border-color: transparent;
+    }
+    
+    .tab-content {
+        padding: 2rem;
+    }
+    
+    .session-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary);
+    }
+    
+    .session-current {
+        border-left-color: var(--success);
+        background: linear-gradient(45deg, rgba(56, 176, 0, 0.05), rgba(76, 201, 240, 0.05));
+    }
+    
+    .session-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .session-details {
+        flex: 1;
+    }
+    
+    .session-actions {
+        margin-left: 1rem;
+    }
+    
+    .btn-end-session {
+        background: var(--secondary);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-end-session:hover {
+        background: var(--secondary-dark);
+        transform: translateY(-1px);
+    }
+    
+    .security-warning {
+        background: linear-gradient(45deg, rgba(255, 190, 11, 0.05), rgba(247, 37, 133, 0.05));
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--warning);
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+        transform: translateY(-2px);
+    }
+    
+    .stats-card {
+        background: linear-gradient(45deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    {% if perfil.foto %}
+                        <img src="{{ perfil.foto.url }}" alt="Foto do perfil" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="profile-role">{{ perfil.get_tipo_usuario_display }}</div>
+            </div>
+            
+            <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                        <i class="fas fa-user me-2"></i>Dados Pessoais
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sessions-tab" data-bs-toggle="tab" data-bs-target="#sessions" type="button" role="tab">
+                        <i class="fas fa-desktop me-2"></i>Sessões Ativas
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                        <i class="fas fa-shield-alt me-2"></i>Segurança
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="profileTabsContent">
+                <!-- Dados Pessoais -->
+                <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" placeholder="Nome">
+                                    <label for="first_name">Nome</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" placeholder="Sobrenome">
+                                    <label for="last_name">Sobrenome</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" placeholder="Email">
+                                    <label for="email">Email</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.telefone }}
+                                    <label for="{{ form.telefone.id_for_label }}">{{ form.telefone.label }}</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.data_nascimento }}
+                                    <label for="{{ form.data_nascimento.id_for_label }}">{{ form.data_nascimento.label }}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.foto }}
+                                    <label for="{{ form.foto.id_for_label }}">{{ form.foto.label }}</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating">
+                            {{ form.endereco }}
+                            <label for="{{ form.endereco.id_for_label }}">{{ form.endereco.label }}</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Sessões Ativas -->
+                <div class="tab-pane fade" id="sessions" role="tabpanel">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-number">{{ sessoes.count }}</div>
+                                <div class="stats-label">Sessões Ativas</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-number">{{ perfil.max_sessions }}</div>
+                                <div class="stats-label">Máximo Permitido</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-number">{{ perfil.session_timeout|floatformat:0 }}s</div>
+                                <div class="stats-label">Timeout da Sessão</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if sessoes.count > 1 %}
+                    <div class="security-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Várias Sessões Detectadas</h6>
+                        <p class="mb-0">Você tem múltiplas sessões ativas. Se você não reconhece alguma delas, encerre-a imediatamente.</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% for sessao in sessoes %}
+                    <div class="session-card {% if sessao.session_key == request.session.session_key %}session-current{% endif %}">
+                        <div class="session-info">
+                            <div class="session-details">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-desktop me-2 text-primary"></i>
+                                    <strong>
+                                        {% if sessao.session_key == request.session.session_key %}
+                                            Esta sessão
+                                        {% else %}
+                                            Outra sessão
+                                        {% endif %}
+                                    </strong>
+                                    {% if sessao.session_key == request.session.session_key %}
+                                        <span class="badge bg-success ms-2">Atual</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="fas fa-map-marker-alt me-1"></i>IP: {{ sessao.ip_address }}<br>
+                                    <i class="fas fa-clock me-1"></i>Início: {{ sessao.data_inicio|date:"d/m/Y H:i" }}<br>
+                                    <i class="fas fa-sync me-1"></i>Última atividade: {{ sessao.data_ultima_atividade|date:"d/m/Y H:i" }}
+                                </div>
+                            </div>
+                            {% if sessao.session_key != request.session.session_key %}
+                            <div class="session-actions">
+                                <a href="{% url 'usuarios:encerrar_sessao' sessao.id %}" class="btn btn-end-session btn-sm">
+                                    <i class="fas fa-times me-1"></i>Encerrar
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted">
+                        <i class="fas fa-desktop fa-3x mb-3"></i>
+                        <p>Nenhuma sessão ativa encontrada.</p>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if sessoes.count > 1 %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'usuarios:encerrar_todas_sessoes' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-power-off me-2"></i>Encerrar Todas as Outras Sessões
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Segurança -->
+                <div class="tab-pane fade" id="security" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-key me-2"></i>Alterar Senha</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted">Mantenha sua conta segura alterando sua senha regularmente.</p>
+                                    <a href="{% url 'usuarios:alterar_senha' %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-edit me-2"></i>Alterar Senha
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-cog me-2"></i>Configurações de Sessão</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="form-floating mb-3">
+                                            {{ form.session_timeout }}
+                                            <label for="{{ form.session_timeout.id_for_label }}">{{ form.session_timeout.label }}</label>
+                                            <div class="form-text">{{ form.session_timeout.help_text }}</div>
+                                        </div>
+                                        
+                                        <div class="form-floating mb-3">
+                                            {{ form.max_sessions }}
+                                            <label for="{{ form.max_sessions.id_for_label }}">{{ form.max_sessions.label }}</label>
+                                            <div class="form-text">{{ form.max_sessions.help_text }}</div>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-save me-1"></i>Salvar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-info-circle me-2"></i>Informações de Segurança</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Último login:</strong><br>
+                                            {{ perfil.ultimo_login|date:"d/m/Y H:i"|default:"Nunca" }}</p>
+                                            
+                                            <p><strong>IP do último login:</strong><br>
+                                            {{ perfil.ip_ultimo_login|default:"Não registrado" }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Tentativas de login:</strong><br>
+                                            {{ perfil.tentativas_login }}</p>
+                                            
+                                            <p><strong>Status da conta:</strong><br>
+                                            {% if perfil.esta_bloqueado %}
+                                                <span class="badge bg-danger">Bloqueada até {{ perfil.bloqueado_ate|date:"d/m/Y H:i" }}</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Ativa</span>
+                                            {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Verificação automática de status da sessão
+function checkSessionStatus() {
+    fetch('{% url "usuarios:check_session" %}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'timeout' || data.status === 'invalid_session') {
+                alert('Sua sessão expirou. Você será redirecionado para o login.');
+                window.location.href = '{% url "usuarios:login" %}';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao verificar sessão:', error);
+        });
+}
+
+// Verificar sessão a cada 5 minutos
+setInterval(checkSessionStatus, 300000);
+
+// Atualizar última atividade com movimentos do mouse
+let lastActivity = Date.now();
+document.addEventListener('mousemove', function() {
+    const now = Date.now();
+    if (now - lastActivity > 60000) { // Apenas a cada minuto
+        lastActivity = now;
+        checkSessionStatus();
+    }
+});
+</script>
+{% endblock %} 

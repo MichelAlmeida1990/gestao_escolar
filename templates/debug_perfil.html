@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Debug Perfil{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Debug - Informações do Perfil</h2>
+    
+    {% if user.is_authenticated %}
+        <div class="card">
+            <div class="card-header">
+                <h5>Usuário Logado: {{ user.username }}</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Nome completo:</strong> {{ user.get_full_name|default:"Não informado" }}</p>
+                <p><strong>Email:</strong> {{ user.email|default:"Não informado" }}</p>
+                <p><strong>É staff:</strong> {{ user.is_staff|yesno:"Sim,Não" }}</p>
+                
+                <hr>
+                
+                <h6>Informações do Perfil:</h6>
+                {% if user.perfil %}
+                    <p><strong>Perfil existe:</strong> Sim</p>
+                    <p><strong>Tipo de usuário:</strong> {{ user.perfil.get_tipo_usuario_display }}</p>
+                    <p><strong>Telefone:</strong> {{ user.perfil.telefone|default:"Não informado" }}</p>
+                    <p><strong>Data de nascimento:</strong> {{ user.perfil.data_nascimento|default:"Não informado" }}</p>
+                    <p><strong>Endereço:</strong> {{ user.perfil.endereco|default:"Não informado" }}</p>
+                    
+                    <hr>
+                    
+                    <h6>Informações da Foto:</h6>
+                    {% if user.perfil.foto %}
+                        <p><strong>Foto existe:</strong> Sim</p>
+                        <p><strong>URL da foto:</strong> {{ user.perfil.foto.url }}</p>
+                        <p><strong>Nome do arquivo:</strong> {{ user.perfil.foto.name }}</p>
+                        <div class="mt-3">
+                            <p><strong>Preview da foto:</strong></p>
+                            <img src="{{ user.perfil.foto.url }}" alt="Foto do perfil" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #007bff;">
+                        </div>
+                    {% else %}
+                        <p><strong>Foto existe:</strong> Não</p>
+                        <p class="text-muted">Nenhuma foto foi carregada ainda.</p>
+                    {% endif %}
+                {% else %}
+                    <p><strong>Perfil existe:</strong> Não</p>
+                    <div class="alert alert-warning">
+                        O usuário não possui um perfil associado. Execute o comando <code>python manage.py criar_perfis_usuarios</code> para criar perfis para todos os usuários.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Você precisa estar logado para ver as informações do perfil.
+            <a href="{% url 'usuarios:login' %}" class="btn btn-primary ms-2">Fazer Login</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Realizar Empréstimo - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3">
+                        <i class="fas fa-handshake text-primary"></i> Realizar Empréstimo
+                    </h1>
+                    <p class="text-muted mb-0">Registrar novo empréstimo de livro</p>
+                </div>
+                <div>
+                    <a href="{% url 'biblioteca:emprestimo_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-plus-circle text-primary"></i> Dados do Empréstimo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" id="emprestimoForm">
+                                {% csrf_token %}
+                                
+                                <!-- Seleção do Livro -->
+                                <div class="mb-4">
+                                    <label for="livro_id" class="form-label fw-semibold">
+                                        <i class="fas fa-book text-primary"></i> Livro *
+                                    </label>
+                                    <select class="form-select" id="livro_id" name="livro_id" required>
+                                        <option value="">Selecione um livro...</option>
+                                        {% for livro in livros %}
+                                            <option value="{{ livro.id }}" 
+                                                    {% if livro.id|stringformat:"s" == livro_selecionado %}selected{% endif %}>
+                                                {{ livro.titulo }}{% if livro.subtitulo %} - {{ livro.subtitulo }}{% endif %}
+                                                ({{ livro.exemplares_disponiveis }} disponível{{ livro.exemplares_disponiveis|pluralize:"eis" }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            Apenas livros disponíveis são exibidos na lista
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Tipo de Usuário -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-users text-primary"></i> Tipo de Usuário *
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="tipo_usuario" 
+                                                       id="tipo_aluno" value="aluno" required>
+                                                <label class="form-check-label" for="tipo_aluno">
+                                                    <i class="fas fa-user-graduate text-info"></i> Aluno
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="tipo_usuario" 
+                                                       id="tipo_professor" value="professor" required>
+                                                <label class="form-check-label" for="tipo_professor">
+                                                    <i class="fas fa-chalkboard-teacher text-success"></i> Professor
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Seleção do Usuário -->
+                                <div class="mb-4">
+                                    <label for="usuario_id" class="form-label fw-semibold">
+                                        <i class="fas fa-user text-primary"></i> Usuário *
+                                    </label>
+                                    
+                                    <!-- Select para Alunos -->
+                                    <select class="form-select" id="aluno_select" name="usuario_id" 
+                                            style="display: none;" disabled>
+                                        <option value="">Selecione um aluno...</option>
+                                        {% for aluno in alunos %}
+                                            <option value="{{ aluno.id }}">
+                                                {{ aluno.nome }} ({{ aluno.matricula }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    
+                                    <!-- Select para Professores -->
+                                    <select class="form-select" id="professor_select" name="usuario_id" 
+                                            style="display: none;" disabled>
+                                        <option value="">Selecione um professor...</option>
+                                        {% for professor in professores %}
+                                            <option value="{{ professor.id }}">
+                                                {{ professor.nome }} ({{ professor.registro_profissional }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Observações -->
+                                <div class="mb-4">
+                                    <label for="observacoes" class="form-label fw-semibold">
+                                        <i class="fas fa-comment text-primary"></i> Observações
+                                    </label>
+                                    <textarea class="form-control" id="observacoes" name="observacoes" 
+                                              rows="3" placeholder="Observações adicionais sobre o empréstimo..."></textarea>
+                                    <div class="form-text">
+                                        <small class="text-muted">Campo opcional para informações adicionais</small>
+                                    </div>
+                                </div>
+
+                                <!-- Botões -->
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'biblioteca:emprestimo_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" id="btnSubmit">
+                                        <i class="fas fa-handshake"></i> Realizar Empréstimo
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoUsuarioRadios = document.querySelectorAll('input[name="tipo_usuario"]');
+    const alunoSelect = document.getElementById('aluno_select');
+    const professorSelect = document.getElementById('professor_select');
+    
+    tipoUsuarioRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'aluno') {
+                alunoSelect.style.display = 'block';
+                alunoSelect.disabled = false;
+                alunoSelect.name = 'usuario_id';
+                professorSelect.style.display = 'none';
+                professorSelect.disabled = true;
+                professorSelect.name = '';
+                professorSelect.selectedIndex = 0;
+            } else {
+                professorSelect.style.display = 'block';
+                professorSelect.disabled = false;
+                professorSelect.name = 'usuario_id';
+                alunoSelect.style.display = 'none';
+                alunoSelect.disabled = true;
+                alunoSelect.name = '';
+                alunoSelect.selectedIndex = 0;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-check-input:checked + .form-check-label {
+    color: var(--bs-primary);
+    font-weight: 500;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+</style>
+{% endblock %}

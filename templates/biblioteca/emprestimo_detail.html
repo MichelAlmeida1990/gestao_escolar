@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes do Empréstimo - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3">
+                        <i class="fas fa-info-circle text-primary"></i> Detalhes do Empréstimo
+                    </h1>
+                    <p class="text-muted mb-0">Informações completas do empréstimo #{{ emprestimo.id }}</p>
+                </div>
+                <div>
+                    <a href="{% url 'biblioteca:emprestimo_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                    {% if emprestimo.status == 'ativo' %}
+                        <a href="{% url 'biblioteca:devolver_livro' emprestimo.id %}" class="btn btn-success">
+                            <i class="fas fa-undo"></i> Devolver
+                        </a>
+                        {% if emprestimo.pode_renovar %}
+                            <a href="{% url 'biblioteca:renovar_emprestimo' emprestimo.id %}" class="btn btn-warning">
+                                <i class="fas fa-sync"></i> Renovar
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informações do Livro -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-book text-primary"></i> Informações do Livro
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="fw-bold">{{ emprestimo.livro.titulo }}</h6>
+                            {% if emprestimo.livro.subtitulo %}
+                                <p class="text-muted small">{{ emprestimo.livro.subtitulo }}</p>
+                            {% endif %}
+                            
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td class="fw-semibold">Autores:</td>
+                                    <td>
+                                        {% for autor in emprestimo.livro.autores.all %}
+                                            {{ autor.nome }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold">ISBN:</td>
+                                    <td>{{ emprestimo.livro.isbn|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold">Código de Barras:</td>
+                                    <td>{{ emprestimo.livro.codigo_barras|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold">Localização:</td>
+                                    <td>{{ emprestimo.livro.localizacao|default:"-" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações do Usuário -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user text-primary"></i> Informações do Usuário
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td class="fw-semibold">Nome:</td>
+                                    <td>{{ emprestimo.nome_usuario }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold">Tipo:</td>
+                                    <td>
+                                        {% if emprestimo.tipo_usuario == 'aluno' %}
+                                            <span class="badge bg-info">Aluno</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Professor</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if emprestimo.tipo_usuario == 'aluno' and emprestimo.aluno %}
+                                    <tr>
+                                        <td class="fw-semibold">Matrícula:</td>
+                                        <td>{{ emprestimo.aluno.matricula }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Email:</td>
+                                        <td>{{ emprestimo.aluno.email|default:"-" }}</td>
+                                    </tr>
+                                {% elif emprestimo.tipo_usuario == 'professor' and emprestimo.professor %}
+                                    <tr>
+                                        <td class="fw-semibold">Registro:</td>
+                                        <td>{{ emprestimo.professor.registro_profissional }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">Email:</td>
+                                        <td>{{ emprestimo.professor.email|default:"-" }}</td>
+                                    </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalhes do Empréstimo -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calendar text-primary"></i> Detalhes do Empréstimo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <td class="fw-semibold">Data do Empréstimo:</td>
+                                            <td>{{ emprestimo.data_emprestimo|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold">Data Prevista de Devolução:</td>
+                                            <td>
+                                                {{ emprestimo.data_prevista_devolucao|date:"d/m/Y" }}
+                                                {% if emprestimo.esta_atrasado %}
+                                                    <br><small class="text-danger">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                        {{ emprestimo.dias_atraso }} dias de atraso
+                                                    </small>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% if emprestimo.data_devolucao %}
+                                            <tr>
+                                                <td class="fw-semibold">Data de Devolução:</td>
+                                                <td>{{ emprestimo.data_devolucao|date:"d/m/Y H:i" }}</td>
+                                            </tr>
+                                        {% endif %}
+                                        <tr>
+                                            <td class="fw-semibold">Status:</td>
+                                            <td>
+                                                {% if emprestimo.status == 'ativo' %}
+                                                    <span class="badge bg-success">Ativo</span>
+                                                {% elif emprestimo.status == 'devolvido' %}
+                                                    <span class="badge bg-info">Devolvido</span>
+                                                {% elif emprestimo.status == 'atrasado' %}
+                                                    <span class="badge bg-danger">Atrasado</span>
+                                                {% elif emprestimo.status == 'renovado' %}
+                                                    <span class="badge bg-warning">Renovado</span>
+                                                {% elif emprestimo.status == 'perdido' %}
+                                                    <span class="badge bg-dark">Perdido</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <td class="fw-semibold">Renovações:</td>
+                                            <td>{{ emprestimo.renovacoes }} vezes</td>
+                                        </tr>
+                                        {% if emprestimo.valor_multa and emprestimo.valor_multa > 0 %}
+                                            <tr>
+                                                <td class="fw-semibold">Valor da Multa:</td>
+                                                <td class="text-danger">R$ {{ emprestimo.valor_multa|floatformat:2 }}</td>
+                                            </tr>
+                                        {% endif %}
+                                        <tr>
+                                            <td class="fw-semibold">Data de Criação:</td>
+                                            <td>{{ emprestimo.data_criacao|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold">Última Atualização:</td>
+                                            <td>{{ emprestimo.data_atualizacao|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {% if emprestimo.observacoes %}
+                                <hr>
+                                <div class="mb-3">
+                                    <h6 class="fw-semibold">Observações:</h6>
+                                    <div class="bg-light p-3 rounded">
+                                        {{ emprestimo.observacoes|linebreaks }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

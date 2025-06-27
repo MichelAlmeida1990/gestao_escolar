@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Boletim de {{ aluno.nome_completo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Boletim Escolar</h5>
+                        <p class="text-sm mb-0">
+                            <i class="fa fa-user text-info" aria-hidden="true"></i>
+                            <span class="font-weight-bold ms-1">{{ aluno.nome_completo }}</span>
+                        </p>
+                        <p class="text-sm mb-0">
+                            <i class="fa fa-graduation-cap text-success" aria-hidden="true"></i>
+                            <span class="ms-1">{{ turma.nome }} - {{ turma.ano_letivo }}</span>
+                        </p>
+                    </div>
+                    <div>
+                        <a href="{% url 'responsaveis:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> Voltar
+                        </a>
+                        <button class="btn btn-primary btn-sm" onclick="window.print()">
+                            <i class="fa fa-print"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Disciplina</th>
+                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">1º Bimestre</th>
+                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">2º Bimestre</th>
+                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">3º Bimestre</th>
+                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">4º Bimestre</th>
+                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Média Final</th>
+                                    <th class="text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-7">Situação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for disciplina, dados in notas_por_disciplina.items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ disciplina.nome }}</h6>
+                                                <p class="text-xs text-secondary mb-0">{{ disciplina.professor.nome_completo }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                    {% for bimestre in '1234' %}
+                                    <td class="align-middle text-center">
+                                        {% for nota in dados.notas %}
+                                            {% if nota.bimestre == bimestre %}
+                                                <span class="badge badge-sm bg-gradient-{% if nota.valor >= 7 %}success{% elif nota.valor >= 5 %}warning{% else %}danger{% endif %}">
+                                                    {{ nota.valor }}
+                                                </span>
+                                                <p class="text-xs text-secondary mb-0">{{ nota.descricao }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    <td class="align-middle text-center">
+                                        <span class="badge badge-lg bg-gradient-{% if dados.media >= 7 %}success{% elif dados.media >= 5 %}warning{% else %}danger{% endif %}">
+                                            {{ dados.media }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        {% if dados.media >= 7 %}
+                                            <span class="badge bg-gradient-success">Aprovado</span>
+                                        {% elif dados.media >= 5 %}
+                                            <span class="badge bg-gradient-warning">Recuperação</span>
+                                        {% else %}
+                                            <span class="badge bg-gradient-danger">Reprovado</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-3">Nenhuma nota registrada ainda.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Seção de Observações e Frequência -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card border">
+                                <div class="card-header pb-0">
+                                    <h6>Frequência</h6>
+                                </div>
+                                <div class="card-body pt-2">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2 text-sm font-weight-bold">Total de Faltas:</span>
+                                            <span class="text-{% if aluno.total_faltas <= 5 %}success{% elif aluno.total_faltas <= 15 %}warning{% else %}danger{% endif %}">
+                                                {{ aluno.total_faltas }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="progress-percentage">
+                                                <span class="text-sm font-weight-bold">Frequência: 
+                                                    {% if aluno.percentual_presenca %}
+                                                        {{ aluno.percentual_presenca }}%
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            {% if aluno.percentual_presenca %}
+                                                <div class="progress-bar bg-gradient-success" role="progressbar" 
+                                                     aria-valuenow="{{ aluno.percentual_presenca }}" aria-valuemin="0" 
+                                                     aria-valuemax="100" style="width: {{ aluno.percentual_presenca }}%;">
+                                                </div>
+                                            {% else %}
+                                                <div class="progress-bar bg-gradient-secondary" role="progressbar" 
+                                                     aria-valuenow="0" aria-valuemin="0" 
+                                                     aria-valuemax="100" style="width: 0%;">
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border">
+                                <div class="card-header pb-0">
+                                    <h6>Observações</h6>
+                                </div>
+                                <div class="card-body pt-2">
+                                    {% if aluno.observacoes %}
+                                        <p class="text-sm">{{ aluno.observacoes }}</p>
+                                    {% else %}
+                                        <p class="text-sm text-secondary">Nenhuma observação registrada.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilo para impressão -->
+<style type="text/css" media="print">
+    @page {
+        size: portrait;
+        margin: 1cm;
+    }
+    .no-print, .no-print * {
+        display: none !important;
+    }
+    header, footer, aside, nav, .btn, .card-header button {
+        display: none !important;
+    }
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+    .container-fluid {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    body {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+</style>
+{% endblock %}

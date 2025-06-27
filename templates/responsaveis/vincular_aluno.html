@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vincular Aluno{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'responsaveis:responsavel_list' %}">Responsáveis</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'responsaveis:responsavel_detail' responsavel.id %}">Detalhes</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Vincular Aluno</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Vincular Aluno ao Responsável: {{ responsavel.nome }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <label for="{{ form.aluno.id_for_label }}" class="form-label">Aluno</label>
+                    {{ form.aluno }}
+                    {% if form.aluno.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.aluno.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.tipo_relacao.id_for_label }}" class="form-label">Tipo de Relação</label>
+                    {{ form.tipo_relacao }}
+                    {% if form.tipo_relacao.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.tipo_relacao.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'responsaveis:responsavel_detail' responsavel.id %}" class="btn btn-secondary me-2">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Vincular</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
