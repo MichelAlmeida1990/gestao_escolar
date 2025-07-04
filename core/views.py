@@ -18,9 +18,9 @@ def home(request):
         'total_turmas': total_turmas,
     }
     
-    return render(request, 'core/home.html', context)
+    return render(request, 'core/dashboard.html', context)
 
 def custom_logout(request):
     logout(request)
     messages.success(request, 'Você saiu do sistema com sucesso!')
-    return redirect('core:home')
+    return redirect('usuarios:login')

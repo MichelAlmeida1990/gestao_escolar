@@ -1,164 +1,295 @@
-{% extends 'base.html' %}
-{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gestão Escolar</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS Variables -->
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-light: #7c93f3;
+            --primary-dark: #5a67d8;
+            --accent: #764ba2;
+            --accent-light: #8b5bb9;
+            --accent-dark: #6b46c1;
+        }
+    </style>
 
-{% block title %}Login - Sistema de Gestão Escolar{% endblock %}
-
-{% block extra_css %}
-<style>
-    .login-section {
-        min-height: calc(100vh - 200px);
+        <style>
+        /* Reset para página de login */
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Poppins', sans-serif;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    /* Container principal centralizado */
+    .login-wrapper {
+        min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 4rem 0;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    }
-    
-    .login-container {
-        max-width: 500px;
-        width: 100%;
-    }
-    
-    .login-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        padding: 2rem;
         position: relative;
-        border: 1px solid rgba(67, 97, 238, 0.1);
+        overflow-y: auto;
     }
     
-    .login-card::before {
+    /* Efeitos de fundo animados */
+    .login-wrapper::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 5px;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
     }
     
+    /* Card de login */
+    .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        padding: 2rem;
+        width: 100%;
+        max-width: 380px;
+        position: relative;
+        z-index: 10;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Header do card */
     .login-header {
-        background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
-        padding: 3rem 2.5rem 2rem;
         text-align: center;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
     }
     
     .login-logo {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: var(--primary);
-        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-bottom: 0.5rem;
     }
     
     .login-logo i {
+        font-size: 2.2rem;
+        color: #667eea;
         margin-right: 0.75rem;
-        font-size: 2.5rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .login-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
     .login-subtitle {
-        color: #5a6a7e;
-        font-size: 1.1rem;
-        margin-bottom: 0;
+        color: #718096;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+        font-weight: 400;
     }
     
-    .login-body {
-        padding: 2.5rem;
+    /* Formulário */
+    .login-form {
+        margin-bottom: 1.25rem;
     }
     
-    .form-floating {
-        margin-bottom: 1.5rem;
+    .form-group {
+        margin-bottom: 1rem;
         position: relative;
     }
     
     .form-control {
-        border-radius: 12px;
-        padding: 1rem 1rem 1rem 3rem;
-        height: calc(3.5rem + 2px);
-        border: 2px solid rgba(0, 0, 0, 0.1);
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.9rem;
         transition: all 0.3s ease;
-        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
     }
     
     .form-control:focus {
-        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
-        border-color: var(--primary);
         outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .form-control::placeholder {
+        color: #a0aec0;
     }
     
     .input-icon {
         position: absolute;
-        left: 1rem;
+        left: 0.75rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #6c757d;
-        z-index: 10;
+        color: #a0aec0;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
     }
     
-    .form-floating label {
-        padding: 1rem 1rem 1rem 3rem;
-        font-weight: 500;
-        color: #6c757d;
+    .form-control:focus + .input-icon {
+        color: #667eea;
     }
     
+    /* Checkbox personalizado */
     .remember-me {
         display: flex;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.25rem;
+        padding: 0.25rem 0;
     }
     
-    .remember-me input {
-        margin-right: 0.5rem;
+    .remember-me input[type="checkbox"] {
+        margin-right: 0.75rem;
+        width: 14px;
+        height: 14px;
+        accent-color: #667eea;
     }
     
+    .remember-me label {
+        color: #4a5568;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+    
+    /* Botão de login */
     .btn-login {
-        background: linear-gradient(45deg, var(--primary), var(--primary-light));
+        width: 100%;
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        padding: 1rem 2.5rem;
-        font-size: 1.1rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
         font-weight: 600;
-        border-radius: 12px;
+        cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
-        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-login:hover::before {
+        left: 100%;
     }
     
     .btn-login:hover {
-        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(67, 97, 238, 0.5);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-login:active {
+        transform: translateY(0);
     }
     
     .btn-login i {
         margin-right: 0.5rem;
     }
     
+    /* Alertas */
+    .alert {
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        border: none;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fed7d7, #feb2b2);
+        color: #c53030;
+        border-left: 4px solid #e53e3e;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+        color: #22543d;
+        border-left: 4px solid #38a169;
+    }
+    
+    /* Footer */
     .login-footer {
         text-align: center;
-        padding: 2rem 2.5rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
-        background: linear-gradient(135deg, rgba(67, 97, 238, 0.03), rgba(114, 9, 183, 0.03));
+        padding-top: 1.25rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .login-footer p {
+        color: #718096;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
     }
     
     .login-footer a {
-        color: var(--primary);
+        color: #667eea;
         text-decoration: none;
-        font-weight: 500;
+        font-weight: 600;
         transition: all 0.3s ease;
         position: relative;
+        font-size: 0.85rem;
     }
     
     .login-footer a:hover {
-        color: var(--accent);
+        color: #764ba2;
     }
     
     .login-footer a::after {
@@ -168,7 +299,7 @@
         height: 2px;
         bottom: -2px;
         left: 50%;
-        background: var(--primary);
+        background: linear-gradient(135deg, #667eea, #764ba2);
         transition: all 0.3s ease;
         transform: translateX(-50%);
     }
@@ -177,130 +308,181 @@
         width: 100%;
     }
     
-    .alert-login {
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        border: none;
-        padding: 1rem 1.5rem;
-    }
-    
-    .alert-danger {
-        background: linear-gradient(45deg, #ffe6e6, #ffcccc);
-        color: #721c24;
-    }
-    
-    .user-type-selector {
-        margin-bottom: 2rem;
-    }
-    
-    .user-type-btn {
-        background: transparent;
-        border: 2px solid rgba(67, 97, 238, 0.2);
-        color: var(--primary);
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        margin: 0.25rem;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-    
-    .user-type-btn.active,
-    .user-type-btn:hover {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-    }
-    
+    /* Informações de segurança */
     .security-info {
-        background: linear-gradient(45deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
-        border-radius: 12px;
-        padding: 1rem;
-        margin-top: 1.5rem;
-        border-left: 4px solid var(--primary);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        border-radius: 10px;
+        padding: 0.75rem;
+        margin-top: 1rem;
+        border-left: 4px solid #667eea;
     }
     
     .security-info small {
-        color: #5a6a7e;
+        color: #718096;
         display: block;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
+        font-size: 0.75rem;
     }
-</style>
-{% endblock %}
-
-{% block content %}
-<section class="login-section">
-    <div class="container">
-        <div class="login-container">
-            <div class="login-card">
-                <div class="login-header">
-                    <div class="login-logo">
-                        <i class="fas fa-graduation-cap"></i>
-                        Gestão Escolar
+    
+    .security-info small:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .login-wrapper {
+            padding: 1rem;
+            min-height: 100vh;
+            align-items: flex-start;
+            padding-top: 1.5rem;
+        }
+        
+        .login-card {
+            padding: 1.75rem;
+            margin: 1rem;
+            margin-bottom: 1.5rem;
+            max-width: 350px;
+        }
+        
+        .login-title {
+            font-size: 1.6rem;
+        }
+        
+        .login-logo i {
+            font-size: 2.2rem;
+        }
+    }
+    
+    /* Para telas muito pequenas */
+    @media (max-width: 480px) {
+        .login-wrapper {
+            padding: 0.5rem;
+            padding-top: 1rem;
+        }
+        
+        .login-card {
+            padding: 1.5rem;
+            margin: 0.5rem;
+            max-width: 320px;
+        }
+        
+        .login-title {
+            font-size: 1.4rem;
+        }
+        
+        .login-logo i {
+            font-size: 2rem;
+        }
+    }
+    
+    /* Efeitos de partículas flutuantes */
+    .floating-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    </style>
+</head>
+<body>
+<div class="login-wrapper">
+    <!-- Partículas flutuantes -->
+    <div class="floating-particles">
+        <div class="particle" style="width: 10px; height: 10px; top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="width: 15px; height: 15px; top: 60%; left: 80%; animation-delay: 2s;"></div>
+        <div class="particle" style="width: 8px; height: 8px; top: 80%; left: 20%; animation-delay: 4s;"></div>
+        <div class="particle" style="width: 12px; height: 12px; top: 30%; left: 70%; animation-delay: 1s;"></div>
+        <div class="particle" style="width: 6px; height: 6px; top: 70%; left: 90%; animation-delay: 3s;"></div>
+    </div>
+    
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h1 class="login-title">Gestão Escolar</h1>
+            <p class="login-subtitle">Acesse sua conta para continuar</p>
+        </div>
+        
+        <div class="login-form">
+            {% if form.errors or form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {% if form.non_field_errors %}
+                    {{ form.non_field_errors.0 }}
+                {% else %}
+                    Usuário ou senha incorretos. Por favor, tente novamente.
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ message }}
                     </div>
-                    <div class="login-subtitle">
-                        Acesse sua conta para continuar
-                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post" action="{% url 'usuarios:login' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <i class="fas fa-user input-icon"></i>
+                    {{ form.username }}
                 </div>
                 
-                <div class="login-body">
-                    {% if form.errors or form.non_field_errors %}
-                    <div class="alert alert-danger alert-login" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        {% if form.non_field_errors %}
-                            {{ form.non_field_errors.0 }}
-                        {% else %}
-                            Usuário ou senha incorretos. Por favor, tente novamente.
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                    
-                    <form method="post" action="{% url 'usuarios:login' %}">
-                        {% csrf_token %}
-                        
-                        <div class="form-floating">
-                            <i class="fas fa-user input-icon"></i>
-                            {{ form.username }}
-                            <label for="id_username">{{ form.username.label }}</label>
-                        </div>
-                        
-                        <div class="form-floating">
-                            <i class="fas fa-lock input-icon"></i>
-                            {{ form.password }}
-                            <label for="id_password">{{ form.password.label }}</label>
-                        </div>
-                        
-                        {% if form.remember_me %}
-                        <div class="remember-me">
-                            {{ form.remember_me }}
-                            <label for="id_remember_me">{{ form.remember_me.label }}</label>
-                        </div>
-                        {% endif %}
-                        
-                        <button type="submit" class="btn btn-login">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Entrar no Sistema
-                        </button>
-                        
-                        <input type="hidden" name="next" value="{{ next }}">
-                    </form>
-                    
-                    <div class="security-info">
-                        <small><i class="fas fa-shield-alt me-1"></i> Sua sessão é segura e monitorada</small>
-                        <small><i class="fas fa-clock me-1"></i> Sessão expira automaticamente por inatividade</small>
-                        <small><i class="fas fa-eye me-1"></i> Tentativas de login são registradas</small>
-                    </div>
+                <div class="form-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    {{ form.password }}
                 </div>
                 
-                <div class="login-footer">
-                    <p class="mb-2">Esqueceu sua senha?</p>
-                    <a href="{% url 'usuarios:recuperar_senha' %}">
-                        <i class="fas fa-key me-1"></i>Recuperar acesso
-                    </a>
+                {% if form.remember_me %}
+                <div class="remember-me">
+                    {{ form.remember_me }}
+                    <label for="id_remember_me">{{ form.remember_me.label }}</label>
                 </div>
+                {% endif %}
+                
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Entrar no Sistema
+                </button>
+                
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+            
+            <div class="security-info">
+                <small><i class="fas fa-shield-alt me-1"></i> Sua sessão é segura e monitorada</small>
+                <small><i class="fas fa-clock me-1"></i> Sessão expira automaticamente por inatividade</small>
+                <small><i class="fas fa-eye me-1"></i> Tentativas de login são registradas</small>
             </div>
         </div>
+        
+        <div class="login-footer">
+            <p>Esqueceu sua senha?</p>
+            <a href="{% url 'usuarios:recuperar_senha' %}">
+                <i class="fas fa-key me-1"></i>Recuperar acesso
+            </a>
+        </div>
     </div>
-</section>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -308,22 +490,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputs = document.querySelectorAll('.form-control');
     inputs.forEach(input => {
         input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
+            this.style.transform = 'scale(1.02)';
         });
         
         input.addEventListener('blur', function() {
-            if (!this.value) {
-                this.parentElement.classList.remove('focused');
-            }
+            this.style.transform = 'scale(1)';
         });
     });
     
-    // Verificar se há inputs com valor ao carregar
-    inputs.forEach(input => {
-        if (input.value) {
-            input.parentElement.classList.add('focused');
+    // Efeito de digitação no título
+    const title = document.querySelector('.login-title');
+    const originalText = title.textContent;
+    title.textContent = '';
+    
+    let i = 0;
+    const typeWriter = () => {
+        if (i < originalText.length) {
+            title.textContent += originalText.charAt(i);
+            i++;
+            setTimeout(typeWriter, 100);
         }
+    };
+    
+    setTimeout(typeWriter, 500);
+    
+    // Animação de entrada dos elementos
+    const elements = document.querySelectorAll('.form-group, .btn-login, .login-footer');
+    elements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            element.style.transition = 'all 0.6s ease';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, 800 + (index * 100));
     });
 });
 </script>
-{% endblock %} 
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
