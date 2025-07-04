@@ -33,6 +33,7 @@ ENV/
 
 # VS Code
 .vscode/
+.history/
 
 # Outros
 .DS_Store

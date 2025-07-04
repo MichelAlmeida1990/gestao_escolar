@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resultado do Relatório de Frequência{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">
+                <i class="fas fa-chart-line text-success me-2"></i>
+                Relatório de Frequência
+            </h1>
+            <p class="text-muted mb-0">
+                {{ turma.nome }} - {{ turma.serie }} - {{ turma.turno }}
+                {% if disciplina %} | {{ disciplina.nome }}{% endif %}
+            </p>
+            <small class="text-muted">Período: {{ data_inicio }} a {{ data_fim }}</small>
+        </div>
+        <div>
+            <a href="{% url 'frequencia:relatorio_frequencia' %}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-search"></i> Novo Relatório
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+        </div>
+    </div>
+
+    <!-- Estatísticas Gerais -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">{{ total_presencas }}</h5>
+                    <p class="card-text">Presenças</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-danger">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">{{ total_faltas }}</h5>
+                    <p class="card-text">Faltas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">{{ total_atrasados }}</h5>
+                    <p class="card-text">Atrasos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-info">
+                <div class="card-body">
+                    <h5 class="card-title text-info">{{ total_justificados }}</h5>
+                    <p class="card-text">Justificados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Percentual de Presença -->
+    <div class="row mb-4">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h5 class="mb-0">Taxa de Presença Geral</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="text-primary mb-0">{{ percentual_presenca }}%</h2>
+                    <div class="progress mt-3" style="height: 20px;">
+                        <div class="progress-bar bg-success" 
+                             role="progressbar" 
+                             style="width: {{ percentual_presenca }}%" 
+                             aria-valuenow="{{ percentual_presenca }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ percentual_presenca }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas por Aluno -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-users me-2"></i>
+                Frequência por Aluno
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Aluno</th>
+                            <th class="text-center">Presenças</th>
+                            <th class="text-center">Faltas</th>
+                            <th class="text-center">Total de Aulas</th>
+                            <th class="text-center">% Presença</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for aluno_stat in alunos_stats %}
+                        <tr>
+                            <td>
+                                <strong>{{ aluno_stat.aluno.nome }}</strong>
+                                <br>
+                                <small class="text-muted">{{ aluno_stat.aluno.matricula }}</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success">{{ aluno_stat.presencas }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-danger">{{ aluno_stat.faltas }}</span>
+                            </td>
+                            <td class="text-center">{{ aluno_stat.total }}</td>
+                            <td class="text-center">
+                                <strong class="{% if aluno_stat.percentual >= 75 %}text-success{% elif aluno_stat.percentual >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ aluno_stat.percentual|floatformat:1 }}%
+                                </strong>
+                            </td>
+                            <td class="text-center">
+                                {% if aluno_stat.percentual >= 75 %}
+                                    <span class="badge bg-success">Satisfatório</span>
+                                {% elif aluno_stat.percentual >= 50 %}
+                                    <span class="badge bg-warning">Atenção</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Crítico</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Nenhum registro encontrado para o período selecionado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registros Detalhados -->
+    {% if registros %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>
+                Registros Detalhados
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Aluno</th>
+                            {% if not disciplina %}<th>Disciplina</th>{% endif %}
+                            <th class="text-center">Status</th>
+                            <th>Observações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registro in registros %}
+                        <tr>
+                            <td>{{ registro.data|date:"d/m/Y" }}</td>
+                            <td>{{ registro.aluno.nome }}</td>
+                            {% if not disciplina %}<td>{{ registro.disciplina.nome }}</td>{% endif %}
+                            <td class="text-center">
+                                {% if registro.status == 'presente' %}
+                                    <span class="badge bg-success">Presente</span>
+                                {% elif registro.status == 'ausente' %}
+                                    <span class="badge bg-danger">Ausente</span>
+                                {% elif registro.status == 'atrasado' %}
+                                    <span class="badge bg-warning">Atrasado</span>
+                                {% elif registro.status == 'justificado' %}
+                                    <span class="badge bg-info">Justificado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if registro.observacoes %}
+                                    {{ registro.observacoes|truncatechars:50 }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@media print {
+    .btn, .card-header, nav, .container .d-flex:first-child .btn {
+        display: none !important;
+    }
+    
+    .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .table {
+        font-size: 12px;
+    }
+    
+    .badge {
+        border: 1px solid #333 !important;
+        color: #333 !important;
+    }
+}
+</style>
+{% endblock %}

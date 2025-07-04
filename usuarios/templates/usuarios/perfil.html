@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil | Sistema de Gestão Escolar{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-lg">
+            <div class="card-header bg-white">
+                <h4 class="mb-0 py-2">
+                    <i class="fas fa-id-card me-2 text-primary"></i>
+                    Meu Perfil
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <div class="text-center">
+                            {% if user.profile_pic %}
+                                <img src="{{ user.profile_pic.url }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                                    <i class="fas fa-user fa-4x text-secondary"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
+                            <p class="text-muted">
+                                {% if user.is_staff %}
+                                    <span class="badge bg-primary">Administrador</span>
+                                {% elif is_professor %}
+                                    <span class="badge bg-info">Professor</span>
+                                {% elif is_responsavel %}
+                                    <span class="badge bg-success">Responsável</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Usuário</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <h5 class="border-bottom pb-2 mb-3">Informações Pessoais</h5>
+                        
+                        <div class="mb-3 row">
+                            <div class="col-sm-4 fw-bold">Nome de Usuário:</div>
+                            <div class="col-sm-8">{{ user.username }}</div>
+                        </div>
+                        
+                        <div class="mb-3 row">
+                            <div class="col-sm-4 fw-bold">Nome Completo:</div>
+                            <div class="col-sm-8">{{ user.get_full_name|default:"Não informado" }}</div>
+                        </div>
+                        
+                        <div class="mb-3 row">
+                            <div class="col-sm-4 fw-bold">E-mail:</div>
+                            <div class="col-sm-8">{{ user.email|default:"Não informado" }}</div>
+                        </div>
+                        
+                        <div class="mb-3 row">
+                            <div class="col-sm-4 fw-bold">Data de Ingresso:</div>
+                            <div class="col-sm-8">{{ user.date_joined|date:"d/m/Y" }}</div>
+                        </div>
+                        
+                        <div class="mb-3 row">
+                            <div class="col-sm-4 fw-bold">Último Acesso:</div>
+                            <div class="col-sm-8">{{ user.last_login|date:"d/m/Y H:i"|default:"Primeiro acesso" }}</div>
+                        </div>
+                        
+                        {% if is_professor and professor %}
+                            <h5 class="border-bottom pb-2 mb-3 mt-4">Informações do Professor</h5>
+                            
+                            <div class="mb-3 row">
+                                <div class="col-sm-4 fw-bold">Formação:</div>
+                                <div class="col-sm-8">{{ professor.formacao|default:"Não informado" }}</div>
+                            </div>
+                            
+                            <div class="mb-3 row">
+                                <div class="col-sm-4 fw-bold">Especialização:</div>
+                                <div class="col-sm-8">{{ professor.especializacao|default:"Não informado" }}</div>
+                            </div>
+                            
+                            <div class="mb-3 row">
+                                <div class="col-sm-4 fw-bold">Turmas:</div>
+                                <div class="col-sm-8">
+                                    {% if professor.turmas.all %}
+                                        <ul class="list-unstyled">
+                                            {% for turma in professor.turmas.all %}
+                                                <li>{{ turma.nome }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        Nenhuma turma atribuída
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if is_responsavel and responsavel %}
+                            <h5 class="border-bottom pb-2 mb-3 mt-4">Informações do Responsável</h5>
+                            
+                            <div class="mb-3 row">
+                                <div class="col-sm-4 fw-bold">Telefone:</div>
+                                <div class="col-sm-8">{{ responsavel.telefone|default:"Não informado" }}</div>
+                            </div>
+                            
+                            <div class="mb-3 row">
+                                <div class="col-sm-4 fw-bold">Alunos:</div>
+                                <div class="col-sm-8">
+                                    {% if responsavel.alunos.all %}
+                                        <ul class="list-unstyled">
+                                            {% for aluno in responsavel.alunos.all %}
+                                                <li>{{ aluno.nome }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        Nenhum aluno associado
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between">
+                <a href="{% url 'core:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Voltar
+                </a>
+                <div>
+                    <a href="{% url 'usuarios:alterar_senha' %}" class="btn btn-primary">
+                        <i class="fas fa-key me-1"></i> Alterar Senha
+                    </a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin:auth_user_change' user.id %}" class="btn btn-info ms-2">
+                            <i class="fas fa-edit me-1"></i> Editar Perfil
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Meus Comunicados</h2>
+    
+    {% if comunicados %}
+        <div class="list-group">
+            {% for comunicado in comunicados %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ comunicado.titulo }}</h5>
+                        <small>{{ comunicado.data_criacao|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">{{ comunicado.conteudo|linebreaks }}</p>
+                    <small>Por: {{ comunicado.autor.get_full_name|default:comunicado.autor.username }}</small>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Nenhum comunicado disponível para você ou seus dependentes.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
