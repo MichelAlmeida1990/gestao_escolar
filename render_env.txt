@@ -1,0 +1,56 @@
+# ========================================
+# CONFIGURAÇÕES DE AMBIENTE PARA RENDER
+# ========================================
+
+# Django Settings Module - OBRIGATÓRIO
+DJANGO_SETTINGS_MODULE=config.settings_production
+
+# Chave Secreta do Django - OBRIGATÓRIO
+SECRET_KEY=*pt*8xfmm&nxhrcisr&3_1=acm^@%7vrx9+%isf35q^=@va5yz
+
+# Debug - SEMPRE False em produção
+DEBUG=False
+
+# Hosts Permitidos - OBRIGATÓRIO
+ALLOWED_HOSTS=gestao-escolar-6tfz.onrender.com,.onrender.com
+
+# Banco de Dados - O Render gera automaticamente quando você cria o PostgreSQL
+# Substitua pela URL do seu banco PostgreSQL do Render
+DATABASE_URL=postgresql://usuario:senha@host:porta/nome_do_banco
+
+# Configurações de Segurança para Produção
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+CSRF_COOKIE_SECURE=True
+SESSION_COOKIE_SECURE=True
+CSRF_TRUSTED_ORIGINS=https://gestao-escolar-6tfz.onrender.com
+
+# ========================================
+# INSTRUÇÕES DE USO NO RENDER:
+# ========================================
+# 1. No Render, vá em Configurações > Variáveis de ambiente
+# 2. Para cada linha acima (sem #), adicione:
+#    - Nome: parte antes do =
+#    - Valor: parte depois do =
+# 3. Exemplo:
+#    Nome: DJANGO_SETTINGS_MODULE
+#    Valor: config.settings_production
+# 4. Clique em "Salvar" para cada uma
+# 5. Reinicie o serviço
+# ========================================
+
+# LISTA RESUMIDA PARA COPIAR E COLAR:
+# Nome: DJANGO_SETTINGS_MODULE | Valor: config.settings_production
+# Nome: SECRET_KEY | Valor: *pt*8xfmm&nxhrcisr&3_1=acm^@%7vrx9+%isf35q^=@va5yz
+# Nome: DEBUG | Valor: False
+# Nome: ALLOWED_HOSTS | Valor: gestao-escolar-6tfz.onrender.com,.onrender.com
+# Nome: DATABASE_URL | Valor: (copie do seu banco PostgreSQL do Render)
+# Nome: SECURE_SSL_REDIRECT | Valor: True
+# Nome: SECURE_HSTS_SECONDS | Valor: 31536000
+# Nome: SECURE_HSTS_INCLUDE_SUBDOMAINS | Valor: True
+# Nome: SECURE_HSTS_PRELOAD | Valor: True
+# Nome: CSRF_COOKIE_SECURE | Valor: True
+# Nome: SESSION_COOKIE_SECURE | Valor: True
+# Nome: CSRF_TRUSTED_ORIGINS | Valor: https://gestao-escolar-6tfz.onrender.com 
