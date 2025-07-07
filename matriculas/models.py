@@ -212,34 +212,37 @@ class ConfiguracaoMatricula(models.Model):
     @classmethod
     def get_config(cls):
         """Retorna a configuração única ou cria uma nova"""
-        config, created = cls.objects.get_or_create(id=1)
-        if created:
-            # Configurações padrão
-            config.data_inicio_matriculas = timezone.now().date()
-            config.data_fim_matriculas = timezone.now().date().replace(month=12, day=31)
-            config.series_disponiveis = [
-                'Educação Infantil - Maternal',
-                'Educação Infantil - Jardim I',
-                'Educação Infantil - Jardim II',
-                '1º Ano do Ensino Fundamental',
-                '2º Ano do Ensino Fundamental',
-                '3º Ano do Ensino Fundamental',
-                '4º Ano do Ensino Fundamental',
-                '5º Ano do Ensino Fundamental',
-                '6º Ano do Ensino Fundamental',
-                '7º Ano do Ensino Fundamental',
-                '8º Ano do Ensino Fundamental',
-                '9º Ano do Ensino Fundamental',
-            ]
-            config.turnos_disponiveis = ['manha', 'tarde', 'noite', 'integral']
-            config.documentos_obrigatorios = [
-                'certidao_nascimento',
-                'rg',
-                'cpf',
-                'comprovante_residencia',
-                'historico_escolar',
-                'carteira_vacinacao',
-                'foto'
-            ]
-            config.save()
+        try:
+            config = cls.objects.get(id=1)
+        except cls.DoesNotExist:
+            # Criar configuração com valores padrão
+            config = cls.objects.create(
+                id=1,
+                data_inicio_matriculas=timezone.now().date(),
+                data_fim_matriculas=timezone.now().date().replace(month=12, day=31),
+                series_disponiveis=[
+                    'Educação Infantil - Maternal',
+                    'Educação Infantil - Jardim I',
+                    'Educação Infantil - Jardim II',
+                    '1º Ano do Ensino Fundamental',
+                    '2º Ano do Ensino Fundamental',
+                    '3º Ano do Ensino Fundamental',
+                    '4º Ano do Ensino Fundamental',
+                    '5º Ano do Ensino Fundamental',
+                    '6º Ano do Ensino Fundamental',
+                    '7º Ano do Ensino Fundamental',
+                    '8º Ano do Ensino Fundamental',
+                    '9º Ano do Ensino Fundamental',
+                ],
+                turnos_disponiveis=['manha', 'tarde', 'noite', 'integral'],
+                documentos_obrigatorios=[
+                    'certidao_nascimento',
+                    'rg',
+                    'cpf',
+                    'comprovante_residencia',
+                    'historico_escolar',
+                    'carteira_vacinacao',
+                    'foto'
+                ]
+            )
         return config
