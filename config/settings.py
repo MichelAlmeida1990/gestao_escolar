@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'financeiro',
     'comunicados',
     'usuarios',
+    'matriculas',
 
 ]
 

@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmação de Matrícula - Sistema de Gestão Escolar{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-5x text-success"></i>
+                </div>
+                <h1 class="text-success mb-3">Matrícula Enviada com Sucesso!</h1>
+                <p class="lead text-muted">
+                    Sua matrícula foi recebida e está sendo processada.
+                </p>
+            </div>
+
+            <!-- Informações da Matrícula -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Informações da Matrícula
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Código da Matrícula:</strong></p>
+                            <h4 class="text-primary">{{ matricula.codigo_matricula }}</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Status:</strong></p>
+                            <span class="badge bg-warning text-dark">{{ matricula.get_status_display }}</span>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nome do Aluno:</strong></p>
+                            <p>{{ matricula.nome_completo }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Série Desejada:</strong></p>
+                            <p>{{ matricula.serie_desejada }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Turno:</strong></p>
+                            <p>{{ matricula.get_turno_desejado_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Data de Envio:</strong></p>
+                            <p>{{ matricula.data_criacao|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próximos Passos -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-check"></i> Próximos Passos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">1. Envio de Documentos</h6>
+                            <p class="text-muted">
+                                Envie os documentos necessários através do link abaixo:
+                            </p>
+                            <a href="{% url 'matriculas:upload_documentos' matricula.codigo_matricula %}" class="btn btn-outline-primary">
+                                <i class="fas fa-upload"></i> Enviar Documentos
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">2. Acompanhamento</h6>
+                            <p class="text-muted">
+                                Acompanhe o status da sua matrícula:
+                            </p>
+                            <a href="{% url 'matriculas:consultar' %}" class="btn btn-outline-info">
+                                <i class="fas fa-search"></i> Consultar Status
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-envelope"></i> Confirmação por E-mail
+                        </h6>
+                        <p class="mb-0">
+                            Você receberá um e-mail de confirmação em <strong>{{ matricula.email }}</strong> 
+                            e <strong>{{ matricula.responsavel_email }}</strong> com todas as informações.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentos Necessários -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt"></i> Documentos Necessários
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Certidão de Nascimento</li>
+                                <li><i class="fas fa-check text-success"></i> RG e CPF</li>
+                                <li><i class="fas fa-check text-success"></i> Comprovante de Residência</li>
+                                <li><i class="fas fa-check text-success"></i> Histórico Escolar</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Carteira de Vacinação</li>
+                                <li><i class="fas fa-check text-success"></i> Foto 3x4</li>
+                                <li><i class="fas fa-check text-success"></i> Declaração de Transferência (se aplicável)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contato -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-phone"></i> Precisa de Ajuda?
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <p class="mb-3">
+                        Em caso de dúvidas, entre em contato conosco:
+                    </p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                            <p><strong>Telefone</strong><br>(11) 99999-9999</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                            <p><strong>E-mail</strong><br>contato@escola.com</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-clock fa-2x text-primary mb-2"></i>
+                            <p><strong>Horário</strong><br>Seg-Sex: 8h às 18h</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="text-center mt-4">
+                <a href="{% url 'matriculas:index' %}" class="btn btn-secondary me-3">
+                    <i class="fas fa-home"></i> Voltar ao Início
+                </a>
+                <a href="{% url 'matriculas:upload_documentos' matricula.codigo_matricula %}" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Enviar Documentos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .badge {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+</style>
+{% endblock %} 

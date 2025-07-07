@@ -16,6 +16,7 @@ urlpatterns = [
     path('financeiro/', include('financeiro.urls', namespace='financeiro')),
     path('comunicados/', include('comunicados.urls')),  # Adicionado o app de comunicados
     path('usuarios/', include('usuarios.urls', namespace='usuarios')),
+    path('matriculas/', include('matriculas.urls', namespace='matriculas')),
 ]
 
 # Configuração para servir arquivos de mídia durante o desenvolvimento

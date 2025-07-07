@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nova Matrícula - Sistema de Gestão Escolar{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="text-primary">
+                    <i class="fas fa-user-plus"></i> Nova Matrícula Online
+                </h2>
+                <p class="text-muted">Preencha todos os campos obrigatórios</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress mb-4" style="height: 8px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" id="matriculaForm">
+                        {% csrf_token %}
+                        
+                        <!-- Dados do Aluno -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-user"></i> Dados do Aluno
+                                </h5>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.nome_completo.id_for_label }}" class="form-label">
+                                    Nome Completo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.nome_completo }}
+                                {% if form.nome_completo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.nome_completo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_nascimento.id_for_label }}" class="form-label">
+                                    Data de Nascimento <span class="text-danger">*</span>
+                                </label>
+                                {{ form.data_nascimento }}
+                                {% if form.data_nascimento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_nascimento.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.cpf.id_for_label }}" class="form-label">
+                                    CPF <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cpf }}
+                                {% if form.cpf.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.cpf.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.rg.id_for_label }}" class="form-label">
+                                    RG <span class="text-danger">*</span>
+                                </label>
+                                {{ form.rg }}
+                                {% if form.rg.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.rg.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.telefone.id_for_label }}" class="form-label">
+                                    Telefone <span class="text-danger">*</span>
+                                </label>
+                                {{ form.telefone }}
+                                {% if form.telefone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.telefone.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    E-mail <span class="text-danger">*</span>
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.confirmar_email.id_for_label }}" class="form-label">
+                                    Confirmar E-mail <span class="text-danger">*</span>
+                                </label>
+                                {{ form.confirmar_email }}
+                                {% if form.confirmar_email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.confirmar_email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Endereço -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-map-marker-alt"></i> Endereço
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="{{ form.endereco.id_for_label }}" class="form-label">
+                                    Endereço <span class="text-danger">*</span>
+                                </label>
+                                {{ form.endereco }}
+                                {% if form.endereco.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.endereco.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.bairro.id_for_label }}" class="form-label">
+                                    Bairro <span class="text-danger">*</span>
+                                </label>
+                                {{ form.bairro }}
+                                {% if form.bairro.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.bairro.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.cidade.id_for_label }}" class="form-label">
+                                    Cidade <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cidade }}
+                                {% if form.cidade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.cidade.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                    Estado <span class="text-danger">*</span>
+                                </label>
+                                {{ form.estado }}
+                                {% if form.estado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.estado.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.cep.id_for_label }}" class="form-label">
+                                    CEP <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cep }}
+                                {% if form.cep.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.cep.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Informações Escolares -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-graduation-cap"></i> Informações Escolares
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.serie_desejada.id_for_label }}" class="form-label">
+                                    Série Desejada <span class="text-danger">*</span>
+                                </label>
+                                {{ form.serie_desejada }}
+                                {% if form.serie_desejada.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.serie_desejada.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.turno_desejado.id_for_label }}" class="form-label">
+                                    Turno Desejado <span class="text-danger">*</span>
+                                </label>
+                                {{ form.turno_desejado }}
+                                {% if form.turno_desejado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.turno_desejado.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.escola_anterior.id_for_label }}" class="form-label">
+                                    Escola Anterior
+                                </label>
+                                {{ form.escola_anterior }}
+                                {% if form.escola_anterior.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.escola_anterior.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Dados do Responsável -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-user-tie"></i> Dados do Responsável
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.responsavel_nome.id_for_label }}" class="form-label">
+                                    Nome do Responsável <span class="text-danger">*</span>
+                                </label>
+                                {{ form.responsavel_nome }}
+                                {% if form.responsavel_nome.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.responsavel_nome.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.responsavel_cpf.id_for_label }}" class="form-label">
+                                    CPF do Responsável <span class="text-danger">*</span>
+                                </label>
+                                {{ form.responsavel_cpf }}
+                                {% if form.responsavel_cpf.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.responsavel_cpf.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.responsavel_telefone.id_for_label }}" class="form-label">
+                                    Telefone do Responsável <span class="text-danger">*</span>
+                                </label>
+                                {{ form.responsavel_telefone }}
+                                {% if form.responsavel_telefone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.responsavel_telefone.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.responsavel_email.id_for_label }}" class="form-label">
+                                    E-mail do Responsável <span class="text-danger">*</span>
+                                </label>
+                                {{ form.responsavel_email }}
+                                {% if form.responsavel_email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.responsavel_email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.confirmar_responsavel_email.id_for_label }}" class="form-label">
+                                    Confirmar E-mail do Responsável <span class="text-danger">*</span>
+                                </label>
+                                {{ form.confirmar_responsavel_email }}
+                                {% if form.confirmar_responsavel_email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.confirmar_responsavel_email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                    Observações Adicionais
+                                </label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.observacoes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Erros gerais do formulário -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Botões -->
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <a href="{% url 'matriculas:index' %}" class="btn btn-secondary me-3">
+                                    <i class="fas fa-arrow-left"></i> Voltar
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane"></i> Enviar Matrícula
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle"></i> Informações Importantes
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Após enviar a matrícula, você receberá um código de acompanhamento por e-mail</li>
+                            <li>Você poderá enviar os documentos necessários posteriormente</li>
+                            <li>Nossa equipe entrará em contato para confirmar os próximos passos</li>
+                            <li>Mantenha o e-mail informado sempre atualizado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Máscaras para os campos
+    $(document).ready(function() {
+        // Máscara para CPF
+        $('#id_cpf, #id_responsavel_cpf').mask('000.000.000-00');
+        
+        // Máscara para telefone
+        $('#id_telefone, #id_responsavel_telefone').mask('(00) 00000-0000');
+        
+        // Máscara para CEP
+        $('#id_cep').mask('00000-000');
+        
+        // Validação em tempo real
+        $('#matriculaForm').on('submit', function() {
+            var isValid = true;
+            
+            // Validar e-mails
+            var email = $('#id_email').val();
+            var confirmEmail = $('#id_confirmar_email').val();
+            
+            if (email !== confirmEmail) {
+                alert('Os e-mails não coincidem!');
+                isValid = false;
+            }
+            
+            var responsavelEmail = $('#id_responsavel_email').val();
+            var confirmResponsavelEmail = $('#id_confirmar_responsavel_email').val();
+            
+            if (responsavelEmail !== confirmResponsavelEmail) {
+                alert('Os e-mails do responsável não coincidem!');
+                isValid = false;
+            }
+            
+            return isValid;
+        });
+    });
+</script>
+{% endblock %} 
