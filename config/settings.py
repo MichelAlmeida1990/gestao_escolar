@@ -5,12 +5,12 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-sua-chave-secreta-aqui'
+SECRET_KEY = '9(o9abc016tb+%xia2-g)3$dx^bc4eqrss@aa6!q$_#5-me-qh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['michel1990.pythonanywhere.com']
 
 # Application definition
 INSTALLED_APPS = [
@@ -117,11 +117,11 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# Configurações de CSRF para desenvolvimento
-CSRF_COOKIE_SECURE = False  # True apenas em produção
+# Configurações de CSRF para produção
+CSRF_COOKIE_SECURE = True  # True para produção
 CSRF_USE_SESSIONS = False
-CSRF_COOKIE_HTTPONLY = False
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000']
+CSRF_COOKIE_HTTPONLY = True
+CSRF_TRUSTED_ORIGINS = ['https://michel1990.pythonanywhere.com']
 
 # Configurações de Password
 AUTH_PASSWORD_VALIDATORS = [
