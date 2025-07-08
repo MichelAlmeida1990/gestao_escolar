@@ -3,141 +3,162 @@
 
 {% block title %}Sistema de Biblioteca{% endblock %}
 
-{% block extra_css %}
-<style>
-    .stats-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
-        padding: 25px;
-        color: white;
-        margin-bottom: 20px;
-        transition: transform 0.3s ease;
-    }
-    .stats-card:hover {
-        transform: translateY(-5px);
-    }
-    .stats-number {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    .quick-action {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: #333;
-        display: block;
-    }
-    .quick-action:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-        text-decoration: none;
-        color: #333;
-    }
-    .quick-action i {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        color: #667eea;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="h3 mb-4">
-                <i class="fas fa-book"></i> Sistema de Biblioteca
+<!-- Hero Section da Biblioteca -->
+<section class="library-hero">
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <i class="fas fa-book-open me-3"></i>
+                        Biblioteca Digital
             </h1>
+                    <p class="hero-subtitle">
+                        Explore o mundo do conhecimento! Gerencie livros, empréstimos e inspire a leitura.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{% url 'biblioteca:livro_list' %}" class="btn btn-modern me-3">
+                            <i class="fas fa-plus me-2"></i>Novo Livro
+                        </a>
+                        <a href="{% url 'biblioteca:emprestimo_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-handshake me-2"></i>Ver Empréstimos
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</section>
 
-    <!-- Estatísticas -->
-    <div class="row">
-        <div class="col-md-3">
-            <div class="stats-card">
-                <div class="stats-number">{{ total_livros }}</div>
-                <div>Total de Livros</div>
+<!-- Estatísticas da Biblioteca -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="stats-card gradient-blue">
+                    <div class="stats-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stats-number">{{ total_livros|default:0 }}</div>
+                    <div class="stats-label">Total de Livros</div>
+                </div>
             </div>
+            
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="stats-card gradient-pink">
+                    <div class="stats-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="stats-number">{{ emprestimos_ativos|default:0 }}</div>
+                    <div class="stats-label">Empréstimos Ativos</div>
         </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <div class="stats-number">{{ emprestimos_ativos }}</div>
-                <div>Empréstimos Ativos</div>
             </div>
+            
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="stats-card gradient-cyan">
+                    <div class="stats-icon">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <div class="stats-number">{{ reservas_ativas|default:0 }}</div>
+                    <div class="stats-label">Reservas Ativas</div>
         </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <div class="stats-number">{{ reservas_ativas }}</div>
-                <div>Reservas Ativas</div>
             </div>
+            
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+                <div class="stats-card gradient-orange">
+                    <div class="stats-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stats-number">{{ emprestimos_vencidos|default:0 }}</div>
+                    <div class="stats-label">Empréstimos Vencidos</div>
         </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                <div class="stats-number">{{ emprestimos_vencidos }}</div>
-                <div>Empréstimos Vencidos</div>
             </div>
         </div>
     </div>
+</section>
 
     <!-- Ações Rápidas -->
-    <div class="row">
-        <div class="col-12">
-            <h4 class="mb-3">Ações Rápidas</h4>
+<section class="actions-section py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8 text-center">
+                <h2 class="section-title">Ações Rápidas</h2>
+                <p class="section-subtitle">Acesse rapidamente as principais funcionalidades da biblioteca</p>
+            </div>
         </div>
-        <div class="col-md-2">
+        
+        <div class="row g-4">
+            <div class="col-md-2" data-aos="fade-up" data-aos-delay="100">
             <a href="{% url 'biblioteca:livro_list' %}" class="quick-action">
+                    <div class="action-icon">
                 <i class="fas fa-book"></i>
+                    </div>
                 <h6>Gerenciar Livros</h6>
             </a>
         </div>
-        <div class="col-md-2">
+            
+            <div class="col-md-2" data-aos="fade-up" data-aos-delay="200">
             <a href="{% url 'biblioteca:emprestimo_list' %}" class="quick-action">
+                    <div class="action-icon">
                 <i class="fas fa-handshake"></i>
+                    </div>
                 <h6>Empréstimos</h6>
             </a>
         </div>
-        <div class="col-md-2">
+            
+            <div class="col-md-2" data-aos="fade-up" data-aos-delay="300">
             <a href="{% url 'biblioteca:reserva_list' %}" class="quick-action">
+                    <div class="action-icon">
                 <i class="fas fa-bookmark"></i>
+                    </div>
                 <h6>Reservas</h6>
             </a>
         </div>
-        <div class="col-md-2">
+            
+            <div class="col-md-2" data-aos="fade-up" data-aos-delay="400">
             <a href="{% url 'biblioteca:autor_list' %}" class="quick-action">
+                    <div class="action-icon">
                 <i class="fas fa-user-edit"></i>
+                    </div>
                 <h6>Autores</h6>
             </a>
         </div>
-        <div class="col-md-2">
+            
+            <div class="col-md-2" data-aos="fade-up" data-aos-delay="500">
             <a href="{% url 'biblioteca:categoria_list' %}" class="quick-action">
+                    <div class="action-icon">
                 <i class="fas fa-tags"></i>
+                    </div>
                 <h6>Categorias</h6>
             </a>
         </div>
-        <div class="col-md-2">
+            
+            <div class="col-md-2" data-aos="fade-up" data-aos-delay="600">
             <a href="{% url 'biblioteca:relatorio_emprestimos' %}" class="quick-action">
+                    <div class="action-icon">
                 <i class="fas fa-chart-bar"></i>
+                    </div>
                 <h6>Relatórios</h6>
             </a>
+            </div>
         </div>
     </div>
+</section>
 
     <!-- Empréstimos Recentes -->
-    <div class="row mt-4">
+<section class="recent-section py-5 library-bg">
+    <div class="container">
+        <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-history"></i> Empréstimos Recentes</h5>
+                <div class="modern-card">
+                    <div class="card-header-modern">
+                        <h3><i class="fas fa-history me-2"></i>Empréstimos Recentes</h3>
                 </div>
-                <div class="card-body">
+                    
                     {% if emprestimos_recentes %}
                         <div class="table-responsive">
-                            <table class="table table-striped">
+                            <table class="table table-modern">
                                 <thead>
                                     <tr>
                                         <th>Aluno</th>
@@ -150,17 +171,33 @@
                                 <tbody>
                                     {% for emprestimo in emprestimos_recentes %}
                                     <tr>
-                                        <td>{{ emprestimo.aluno.nome }}</td>
-                                        <td>{{ emprestimo.livro.titulo }}</td>
+                                        <td>
+                                            <div class="user-info">
+                                                <i class="fas fa-user-circle me-2 text-primary"></i>
+                                                {{ emprestimo.aluno.nome }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="book-info">
+                                                <i class="fas fa-book me-2 text-success"></i>
+                                                {{ emprestimo.livro.titulo }}
+                                            </div>
+                                        </td>
                                         <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
                                         <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
                                         <td>
                                             {% if emprestimo.status == 'ativo' %}
-                                                <span class="badge badge-success">Ativo</span>
+                                                <span class="badge badge-modern success">
+                                                    <i class="fas fa-check me-1"></i>Ativo
+                                                </span>
                                             {% elif emprestimo.status == 'devolvido' %}
-                                                <span class="badge badge-info">Devolvido</span>
+                                                <span class="badge badge-modern info">
+                                                    <i class="fas fa-undo me-1"></i>Devolvido
+                                                </span>
                                             {% elif emprestimo.status == 'vencido' %}
-                                                <span class="badge badge-danger">Vencido</span>
+                                                <span class="badge badge-modern danger">
+                                                    <i class="fas fa-exclamation me-1"></i>Vencido
+                                                </span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -169,11 +206,242 @@
                             </table>
                         </div>
                     {% else %}
-                        <p class="text-muted">Nenhum empréstimo encontrado.</p>
+                        <div class="empty-state">
+                            <i class="fas fa-book-open text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted">Nenhum empréstimo encontrado</h5>
+                            <p class="text-muted">Quando houver empréstimos, eles aparecerão aqui.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<style>
+    /* Hero Section da Biblioteca */
+    .library-hero {
+        background: linear-gradient(135deg, 
+            rgba(67, 97, 238, 0.9) 0%, 
+            rgba(114, 9, 183, 0.8) 50%, 
+            rgba(247, 37, 133, 0.9) 100%
+        ),
+        url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80') center/cover;
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        color: white;
+        position: relative;
+    }
+
+    .library-hero::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .library-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Stats Cards */
+    .stats-section {
+        background: rgba(248, 249, 250, 0.8);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .stats-card.gradient-blue {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stats-card.gradient-pink {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .stats-card.gradient-cyan {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .stats-card.gradient-orange {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+    }
+
+    .stats-number {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
+    /* Quick Actions */
+    .quick-action {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #333;
+        display: block;
+        border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    .quick-action:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(67, 97, 238, 0.15);
+        text-decoration: none;
+        color: #333;
+    }
+
+    .action-icon {
+        width: 70px;
+        height: 70px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.8rem;
+    }
+
+    .quick-action h6 {
+        margin: 0;
+        font-weight: 600;
+        color: #5a6a7e;
+    }
+
+    /* Modern Table */
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead th {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+    }
+
+    .table-modern tbody tr {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .table-modern tbody tr:hover {
+        background: rgba(67, 97, 238, 0.05);
+    }
+
+    .table-modern td {
+        padding: 1rem;
+        border: none;
+        vertical-align: middle;
+    }
+
+    .user-info, .book-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .badge-modern {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+
+    .badge-modern.success {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+        color: white;
+    }
+
+    .badge-modern.info {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: white;
+    }
+
+    .badge-modern.danger {
+        background: linear-gradient(135deg, #fa709a, #fee140);
+        color: white;
+    }
+
+    .card-header-modern {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 20px 20px 0 0;
+        margin: -2rem -2rem 2rem -2rem;
+    }
+
+    .card-header-modern h3 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        color: #5a6a7e;
+    }
+</style>
+
+<!-- AOS Animation Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true
+    });
+</script>
 {% endblock %} 

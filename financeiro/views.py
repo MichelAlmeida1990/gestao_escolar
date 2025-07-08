@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db.models import Q, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from .models import Mensalidade, ConfiguracaoFinanceira, PlanoContas, CategoriaFinanceira
 from alunos.models import Aluno
@@ -26,7 +26,7 @@ def index(request):
         return redirect('home')
     
     # Estatísticas do mês atual
-    hoje = timezone.now().date()
+    hoje = date.today()
     mes_atual = hoje.month
     ano_atual = hoje.year
     
@@ -46,10 +46,8 @@ def index(request):
     valor_recebido = mensalidades_mes.filter(status='pago').aggregate(total=Sum('valor_total'))['total'] or 0
     valor_pendente = mensalidades_mes.filter(status__in=['pendente', 'vencido']).aggregate(total=Sum('valor_total'))['total'] or 0
     
-    # Mensalidades vencidas (últimos 30 dias)
-    data_limite = hoje - timedelta(days=30)
+    # Mensalidades vencidas (todas)
     mensalidades_vencidas = Mensalidade.objects.filter(
-        data_vencimento__gte=data_limite,
         data_vencimento__lt=hoje,
         status__in=['pendente', 'vencido']
     ).select_related('aluno', 'turma')[:10]
@@ -144,7 +142,7 @@ def gerar_mensalidades(request):
                 data_vencimento = datetime(ano, mes + 1, 1).date() - timedelta(days=1)
         
         # Buscar todos os alunos ativos
-        alunos = Aluno.objects.filter(ativo=True).select_related('turma_atual')
+        alunos = Aluno.objects.filter(status='ativo')
         
         mensalidades_criadas = 0
         for aluno in alunos:

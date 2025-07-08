@@ -8,9 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '9(o9abc016tb+%xia2-g)3$dx^bc4eqrss@aa6!q$_#5-me-qh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['michel1990.pythonanywhere.com']
+ALLOWED_HOSTS = ['michel1990.pythonanywhere.com', '127.0.0.1', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [

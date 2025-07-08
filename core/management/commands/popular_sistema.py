@@ -512,14 +512,24 @@ class Command(BaseCommand):
         # Mensalidades para alunos
         config = ConfiguracaoFinanceira.objects.first()
         if config:
-            for aluno in alunos[:15]:  # Apenas 15 para não sobrecarregar
+            for idx, aluno in enumerate(alunos[:15]):  # Apenas 15 para não sobrecarregar
                 # Criar mensalidades dos últimos 3 meses
                 for mes in range(3):
                     data_base = date.today().replace(day=1) - timedelta(days=30*mes)
                     vencimento = data_base.replace(day=config.dia_vencimento_mensalidade)
-                    
                     valor_base = config.valor_padrao_mensalidade + Decimal(random.randint(-50, 100))
-                    
+
+                    # Forçar as 5 primeiras mensalidades a serem vencidas (data no passado e status vencido)
+                    if idx < 5 and mes == 0:
+                        status = 'vencido'
+                        vencimento = date.today() - timedelta(days=10 + idx*2)
+                        data_pagamento = None
+                    else:
+                        status = random.choice(['pendente', 'pago', 'vencido'])
+                        data_pagamento = None
+                        if vencimento <= date.today() and status == 'pago' and random.random() > 0.3:
+                            data_pagamento = self.fake.date_between(start_date=vencimento, end_date=date.today())
+
                     Mensalidade.objects.create(
                         aluno=aluno,
                         turma=random.choice(turmas),
@@ -528,8 +538,8 @@ class Command(BaseCommand):
                         valor_base=valor_base,
                         valor_total=valor_base,
                         data_vencimento=vencimento,
-                        status=random.choice(['pendente', 'pago', 'vencido']),
-                        data_pagamento=self.fake.date_between(start_date=vencimento, end_date='today') if random.random() > 0.3 else None
+                        status=status,
+                        data_pagamento=data_pagamento
                     )
 
     def criar_dados_frequencia(self, alunos, turmas, disciplinas, professores):

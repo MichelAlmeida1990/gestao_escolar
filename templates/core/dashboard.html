@@ -1,421 +1,367 @@
 {% extends 'base.html' %}
 
-{% block title %}Gestão Escolar - Página Inicial{% endblock %}
+{% block title %}Dashboard - Sistema de Gestão Escolar{% endblock %}
 
-{% block extra_css %}
-<style>
-    /* Hero Section com design moderno e vibrante */
-    .hero-section {
-        position: relative;
-        padding: 6rem 0 8rem;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        overflow: hidden;
-        border-radius: 0 0 50px 50px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    }
-    
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: -10%;
-        right: -10%;
-        width: 500px;
-        height: 500px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.1));
-        z-index: 0;
-    }
-    
-    .hero-section::after {
-        content: '';
-        position: absolute;
-        bottom: -10%;
-        left: -10%;
-        width: 400px;
-        height: 400px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(247, 37, 133, 0.1), rgba(181, 23, 158, 0.1));
-        z-index: 0;
-    }
-    
-    .hero-content {
-        position: relative;
-        z-index: 1;
-        text-align: center;
-    }
-    
-    .hero-content h1 {
-        font-family: 'Montserrat', sans-serif;
-        color: var(--primary);
-        font-weight: 700;
-        font-size: 3.5rem;
-        margin-bottom: 1rem;
-        animation: fadeInDown 1s ease-out;
-        letter-spacing: -1px;
-    }
-    
-    .hero-content h2 {
-        font-family: 'Montserrat', sans-serif;
-        color: var(--text-dark);
-        font-weight: 600;
-        font-size: 2.2rem;
-        margin-bottom: 1.5rem;
-        animation: fadeInDown 1.2s ease-out;
-    }
-    
-    .hero-content p {
-        color: #5a6a7e;
-        font-size: 1.2rem;
-        max-width: 800px;
-        margin: 0 auto 2.5rem;
-        line-height: 1.7;
-        animation: fadeInUp 1.4s ease-out;
-    }
-    
-    .btn-custom-primary {
-        background: linear-gradient(45deg, var(--primary), var(--primary-light));
-        color: white;
-        border: none;
-        padding: 0.9rem 2.5rem;
-        font-size: 1.1rem;
-        font-weight: 500;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
-        position: relative;
-        overflow: hidden;
-        z-index: 1;
-    }
-    
-    .btn-custom-primary::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: all 0.6s ease;
-        z-index: -1;
-    }
-    
-    .btn-custom-primary:hover {
-        background: linear-gradient(45deg, var(--primary-dark), var(--primary));
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.5);
-    }
-    
-    .btn-custom-primary:hover::before {
-        left: 100%;
-    }
-
-    /* Cards de Recursos (Features) com design colorido */
-    .features-section {
-        margin-top: 2rem;
-        padding: 5rem 0;
-        position: relative;
-    }
-    
-    .section-title {
-        text-align: center;
-        margin-bottom: 4rem;
-        position: relative;
-    }
-    
-    .section-title h2 {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 700;
-        color: var(--primary);
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .section-title p {
-        color: #5a6a7e;
-        font-size: 1.1rem;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    
-    .section-title::after {
-        content: '';
-        display: block;
-        width: 80px;
-        height: 4px;
-        background: linear-gradient(90deg, var(--secondary), var(--accent));
-        margin: 1rem auto;
-        border-radius: 2px;
-    }
-    
-    .feature-card {
-        background: white;
-        padding: 2.5rem 2rem;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        transition: all 0.4s ease;
-        position: relative;
-        overflow: hidden;
-        height: 100%;
-        border-bottom: 4px solid transparent;
-    }
-    
-    .feature-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 5px;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.4s ease;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-15px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        border-bottom: 4px solid var(--secondary);
-    }
-    
-    .feature-card:hover::before {
-        transform: scaleX(1);
-    }
-    
-    .feature-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.1));
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-    }
-    
-    .feature-card:hover .feature-icon {
-        background: linear-gradient(135deg, rgba(67, 97, 238, 0.2), rgba(114, 9, 183, 0.2));
-        transform: scale(1.1);
-    }
-    
-    .feature-icon i {
-        font-size: 2.5rem;
-        color: var(--primary);
-        transition: all 0.3s ease;
-    }
-    
-    .feature-card:hover .feature-icon i {
-        color: var(--accent);
-    }
-    
-    .feature-card h3 {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-    }
-    
-    .feature-card:hover h3 {
-        color: var(--accent);
-    }
-    
-    .feature-card p {
-        color: #5a6a7e;
-        font-size: 1rem;
-        line-height: 1.6;
-    }
-
-    /* Seção CTA */
-    .cta-section {
-        padding: 5rem 0;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        text-align: center;
-        border-radius: 50px 50px 0 0;
-    }
-
-    .cta-content h2 {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 700;
-        color: var(--primary);
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .cta-content p {
-        color: #5a6a7e;
-        font-size: 1.2rem;
-        max-width: 700px;
-        margin: 0 auto 2rem;
-    }
-
-    .btn-custom-secondary {
-        background: linear-gradient(45deg, var(--secondary), var(--secondary-light));
-        color: white;
-        border: none;
-        padding: 0.9rem 2.5rem;
-        font-size: 1.1rem;
-        font-weight: 500;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(247, 37, 133, 0.4);
-    }
-
-    .btn-custom-secondary:hover {
-        background: linear-gradient(45deg, var(--secondary-dark), var(--secondary));
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(247, 37, 133, 0.5);
-        color: white;
-    }
-
-    /* Estatísticas */
-    .stats-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        margin-top: -100px;
-        position: relative;
-        z-index: 10;
-    }
-
-    .stats-item h3 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--primary);
-        margin-bottom: 0.5rem;
-    }
-
-    .stats-item p {
-        color: #5a6a7e;
-        font-size: 1.1rem;
-        font-weight: 500;
-    }
-
-    /* Animações */
-    @keyframes fadeInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
-{% endblock %}
+<!-- Meta tag para evitar cache -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 {% block content %}
-<!-- Seção Hero (Banner Principal) -->
+<!-- Hero Section com Estatísticas Rápidas -->
 <section class="hero-section">
-    <div class="container">
-        <div class="hero-content">
-            <h1>Gestão Escolar</h1>
-            <h2>Simplifique a Administração da Sua Escola</h2>
-            <p>
-                Uma plataforma completa para gerenciar alunos, professores e turmas de forma eficiente e organizada. 
-                Otimize processos, acompanhe o progresso e mantenha tudo em um só lugar.
-            </p>
-            <a href="#" class="btn btn-custom-primary">Começar Agora</a>
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-school mb-3"></i><br>
+            Sistema de Gestão Escolar
+        </h1>
+        <h2 class="hero-subtitle">
+            Bem-vindo{% if user.get_full_name %}, {{ user.get_full_name }}{% endif %}!
+        </h2>
+        <p class="lead">
+            Gerencie sua instituição de ensino de forma eficiente e moderna. Tudo que você precisa em um só lugar.
+        </p>
+        {% if user.is_staff %}
+        <a href="#recursos" class="btn btn-modern btn-lg">
+            <i class="fas fa-rocket me-2"></i>
+            Explorar Recursos
+        </a>
+        {% endif %}
+        <!-- Estatísticas rápidas agora dentro do hero-content -->
+        <div class="hero-stats d-flex justify-content-center align-items-center flex-wrap mt-4">
+            <div class="stat-badge mx-2 my-1 bg-primary text-white"><i class="fas fa-user-graduate me-1"></i> {{ total_alunos|default:0 }} Alunos</div>
+            <div class="stat-badge mx-2 my-1 bg-success text-white"><i class="fas fa-chalkboard-teacher me-1"></i> {{ total_professores|default:0 }} Professores</div>
+            <div class="stat-badge mx-2 my-1 bg-info text-white"><i class="fas fa-users me-1"></i> {{ total_turmas|default:0 }} Turmas</div>
+            <div class="stat-badge mx-2 my-1 bg-warning text-dark"><i class="fas fa-file-signature me-1"></i> {{ matriculas_pendentes|default:0 }} Matrículas</div>
         </div>
     </div>
 </section>
 
-<!-- Estatísticas -->
-<div class="container">
-    <div class="stats-card">
-        <div class="row">
-            <div class="col-md-4 stats-item">
-                <h3>{{ total_professores }}</h3>
-                <p>Professores</p>
+<!-- Grid de Recursos Compacto -->
+<section id="recursos" class="resources-section py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-10 text-center">
+                <h2 class="resources-title mb-3">
+                    <i class="fas fa-rocket me-2"></i>
+                    Recursos do Sistema
+                </h2>
+                <p class="resources-subtitle">
+                    Descubra as principais ferramentas para uma gestão educacional eficiente
+                </p>
             </div>
-            <div class="col-md-4 stats-item">
-                <h3>{{ total_alunos }}</h3>
-                <p>Alunos</p>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            <!-- Card 1 -->
+            <div class="col">
+                <div class="resource-card card-alunos">
+                    <div class="resource-icon students"><i class="fas fa-user-graduate"></i></div>
+                    <h4>Gestão de Alunos</h4>
+                    <p>Cadastro completo, histórico e documentos.</p>
+                    <a href="{% url 'alunos:aluno_list' %}" class="resource-link btn btn-primary">Ver Alunos</a>
+                </div>
             </div>
-            <div class="col-md-4 stats-item">
-                <h3>{{ total_turmas }}</h3>
-                <p>Turmas</p>
+            <!-- Card 2 -->
+            <div class="col">
+                <div class="resource-card card-matriculas">
+                    <div class="resource-icon enrollment"><i class="fas fa-file-signature"></i></div>
+                    <h4>Matrículas Online</h4>
+                    <p>Processo digital e aprovação automática.</p>
+                    <a href="{% url 'matriculas:index' %}" class="resource-link btn btn-success">Matricular</a>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col">
+                <div class="resource-card card-financeiro">
+                    <div class="resource-icon financial"><i class="fas fa-coins"></i></div>
+                    <h4>Financeiro</h4>
+                    <p>Mensalidades, relatórios e controle.</p>
+                    <a href="{% url 'financeiro:index' %}" class="resource-link btn btn-warning text-dark">Ver Finanças</a>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="col">
+                <div class="resource-card card-biblioteca">
+                    <div class="resource-icon library"><i class="fas fa-book-open"></i></div>
+                    <h4>Biblioteca</h4>
+                    <p>Gestão de acervo e empréstimos digitais.</p>
+                    <a href="{% url 'biblioteca:index' %}" class="resource-link btn btn-info text-white">Ver Biblioteca</a>
+                </div>
+            </div>
+            <!-- Card 5 -->
+            <div class="col">
+                <div class="resource-card card-notas">
+                    <div class="resource-icon grades"><i class="fas fa-chart-line"></i></div>
+                    <h4>Notas e Boletins</h4>
+                    <p>Boletins automáticos e análises.</p>
+                    <a href="{% url 'notas:disciplina_list' %}" class="resource-link btn btn-secondary">Ver Notas</a>
+                </div>
+            </div>
+            <!-- Card 6 -->
+            <div class="col">
+                <div class="resource-card card-frequencia">
+                    <div class="resource-icon attendance"><i class="fas fa-user-check"></i></div>
+                    <h4>Frequência</h4>
+                    <p>Chamada digital e relatórios de presença.</p>
+                    <a href="{% url 'frequencia:index' %}" class="resource-link btn btn-danger">Ver Frequência</a>
+                </div>
             </div>
         </div>
     </div>
+</section>
+
+<style>
+.hero-section { min-height: 35vh !important; }
+.hero-stats { position: static !important; margin-top: 2rem; }
+.hero-stats .stat-badge {
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 0.5rem;
+    opacity: 0.97;
+}
+.resource-card {
+    background: rgba(255,255,255,0.13) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 2px 12px rgba(31,38,135,0.07) !important;
+    padding: 1rem 0.7rem 1.2rem 0.7rem !important;
+    min-height: 140px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: box-shadow 0.2s, transform 0.2s;
+    border: none !important;
+}
+.resource-card:hover {
+    box-shadow: 0 8px 24px rgba(67,97,238,0.13) !important;
+    transform: translateY(-4px) scale(1.03);
+}
+.resource-icon {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1.2rem !important;
+    margin-bottom: 0.5rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.resource-card h4 {
+    font-size: 1.05rem !important;
+    margin-bottom: 0.3rem !important;
+    font-weight: 700;
+}
+.resource-card p {
+    font-size: 0.85rem !important;
+    margin-bottom: 0.7rem !important;
+    color: #f8f9fa;
+}
+.resource-link.btn {
+    font-size: 0.9rem !important;
+    font-weight: 600;
+    border-radius: 20px !important;
+    padding: 0.4rem 1.1rem !important;
+    margin-top: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: background 0.2s, color 0.2s;
+}
+.card-alunos {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    color: #fff !important;
+}
+.card-matriculas {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+    color: #fff !important;
+}
+.card-financeiro {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+    color: #fff !important;
+}
+.card-biblioteca {
+    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%) !important;
+    color: #fff !important;
+}
+.card-notas {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+}
+.card-frequencia {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    color: #fff !important;
+}
+.resource-card h4, .resource-card p {
+    color: #fff !important;
+}
+.resource-link.btn {
+    background: rgba(255,255,255,0.15) !important;
+    color: #fff !important;
+    border: 1.5px solid rgba(255,255,255,0.25) !important;
+}
+.resource-link.btn:hover {
+    background: rgba(255,255,255,0.25) !important;
+    color: #222 !important;
+}
+@media (max-width: 991px) {
+    .hero-section { min-height: 28vh !important; }
+    .resource-card { min-height: 120px !important; }
+}
+@media (max-width: 600px) {
+    .hero-section { min-height: 18vh !important; }
+    .resource-card { min-height: 90px !important; padding: 0.7rem 0.2rem 0.8rem 0.2rem !important; }
+    .resource-card h4 { font-size: 0.95rem !important; }
+}
+</style>
+
+<!-- Seção de Ações Rápidas para Responsáveis -->
+{% if is_responsavel %}
+<section class="classroom-bg py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="modern-card">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-heart text-danger me-2"></i>
+                        Área do Responsável
+                    </h3>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center">
+                            <div class="feature-icon mx-auto mb-3">
+                                <i class="fas fa-child"></i>
+        </div>
+                            <h5>Meus Filhos</h5>
+                            <p class="text-muted small mb-3">Acompanhe o desenvolvimento escolar</p>
+                            <a href="{% url 'alunos:meus_alunos' %}" class="btn btn-outline-primary btn-sm">
+                                Ver Alunos
+                            </a>
+    </div>
+                        
+                        <div class="col-md-4 text-center">
+                            <div class="feature-icon mx-auto mb-3">
+                                <i class="fas fa-chart-bar"></i>
+            </div>
+                            <h5>Boletim</h5>
+                            <p class="text-muted small mb-3">Consulte notas e desempenho</p>
+                            <a href="{% url 'responsaveis:boletim' %}" class="btn btn-outline-primary btn-sm">
+                                Ver Boletim
+                            </a>
 </div>
 
-<!-- Seção de Recursos (Features) -->
-<section class="features-section">
-    <div class="container">
-        <div class="section-title">
-            <h2>Funcionalidades</h2>
-            <p>Descubra como nossa plataforma pode ajudar na gestão da sua escola com ferramentas modernas e intuitivas.</p>
+                        <div class="col-md-4 text-center">
+                            <div class="feature-icon mx-auto mb-3">
+                                <i class="fas fa-bullhorn"></i>
         </div>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <div class="col">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                    <h3>Gestão de Alunos</h3>
-                    <p>Registre, edite e acompanhe informações de alunos com facilidade, mantendo todos os dados organizados.</p>
-                    <a href="/alunos/" class="btn btn-sm btn-primary mt-3">Ver Alunos</a>
-                </div>
+                            <h5>Comunicados</h5>
+                            <p class="text-muted small mb-3">Mensagens da escola</p>
+                            <a href="{% url 'comunicados:meus_comunicados' %}" class="btn btn-outline-primary btn-sm">
+                                Ver Comunicados
+                            </a>
             </div>
-            <div class="col">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chalkboard-teacher"></i>
                     </div>
-                    <h3>Controle de Professores</h3>
-                    <p>Gerencie o cadastro de professores, associe-os a turmas e acompanhe suas atividades.</p>
-                    <a href="/professores/" class="btn btn-sm btn-primary mt-3">Ver Professores</a>
-                </div>
-            </div>
-            <div class="col">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Organização de Turmas</h3>
-                    <p>Crie turmas, associe alunos e professores, e tenha uma visão clara de toda a estrutura escolar.</p>
-                    <a href="/turmas/" class="btn btn-sm btn-primary mt-3">Ver Turmas</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
+{% endif %}
 
-<!-- Seção de Chamada para Ação (CTA) -->
-<section class="cta-section">
-    <div class="container">
-        <div class="cta-content">
-            <h2>Transforme a Gestão da Sua Escola</h2>
-            <p>Comece agora mesmo a organizar sua escola de forma prática e eficiente com nossa plataforma.</p>
-            <div class="mt-4">
-                <a href="/professores/cadastro/" class="btn btn-custom-secondary me-2 mb-2">
-                    <i class="fas fa-plus"></i> Novo Professor
-                </a>
-                <a href="/alunos/cadastro/" class="btn btn-custom-secondary me-2 mb-2">
-                    <i class="fas fa-plus"></i> Novo Aluno
-                </a>
-                <a href="/turmas/cadastro/" class="btn btn-custom-secondary mb-2">
-                    <i class="fas fa-plus"></i> Nova Turma
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
+<!-- AOS Animation Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Aguardar o carregamento completo da página
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar AOS com configurações mais seguras
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50,
+            delay: 0
+        });
+        
+        // Forçar a exibição dos cards caso haja problemas
+        setTimeout(function() {
+            const cards = document.querySelectorAll('.resource-card');
+            cards.forEach(function(card) {
+                card.style.display = 'block';
+                card.style.visibility = 'visible';
+                card.style.opacity = '1';
+            });
+        }, 1000);
+    });
+    
+    // Fallback caso o AOS não carregue
+    window.addEventListener('load', function() {
+        if (typeof AOS === 'undefined') {
+            const cards = document.querySelectorAll('.resource-card');
+            cards.forEach(function(card) {
+                card.style.display = 'block';
+                card.style.visibility = 'visible';
+                card.style.opacity = '1';
+            });
+        }
+        
+        // Debug: verificar se os cards estão visíveis
+        console.log('Verificando cards...');
+        const cards = document.querySelectorAll('.resource-card');
+        console.log('Número de cards encontrados:', cards.length);
+        cards.forEach(function(card, index) {
+            const computedStyle = window.getComputedStyle(card);
+            console.log(`Card ${index + 1}:`, {
+                display: computedStyle.display,
+                visibility: computedStyle.visibility,
+                opacity: computedStyle.opacity,
+                height: computedStyle.height,
+                width: computedStyle.width
+            });
+        });
+    });
+</script>
+
+<!-- Script de emergência para garantir visibilidade dos cards -->
+<script>
+    // Script de emergência para garantir que os cards sejam sempre visíveis
+    function forceShowCards() {
+        const cards = document.querySelectorAll('.resource-card');
+        cards.forEach(function(card) {
+            card.style.setProperty('display', 'block', 'important');
+            card.style.setProperty('visibility', 'visible', 'important');
+            card.style.setProperty('opacity', '1', 'important');
+            card.style.setProperty('transform', 'none', 'important');
+            card.style.setProperty('position', 'relative', 'important');
+            card.style.setProperty('z-index', '1', 'important');
+        });
+        
+        // Também garantir que os containers dos cards sejam visíveis
+        const containers = document.querySelectorAll('.col-lg-4, .col-md-6');
+        containers.forEach(function(container) {
+            container.style.setProperty('display', 'block', 'important');
+            container.style.setProperty('visibility', 'visible', 'important');
+            container.style.setProperty('opacity', '1', 'important');
+        });
+    }
+    
+    // Executar imediatamente
+    forceShowCards();
+    
+    // Executar após carregamento da página
+    document.addEventListener('DOMContentLoaded', forceShowCards);
+    
+    // Executar após carregamento completo
+    window.addEventListener('load', forceShowCards);
+    
+    // Executar periodicamente por segurança
+    setInterval(forceShowCards, 2000);
+    
+    // Forçar reload do CSS se ainda houver problemas
+    setTimeout(function() {
+        const resourceCards = document.querySelectorAll('#recursos .resource-card');
+        if (resourceCards.length === 0 || window.getComputedStyle(resourceCards[0]).minHeight === '120px') {
+            console.log('Recarregando CSS...');
+            location.reload(true);
+        }
+    }, 3000);
+</script>
 {% endblock %}

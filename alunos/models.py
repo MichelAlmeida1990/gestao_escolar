@@ -77,3 +77,10 @@ class Aluno(models.Model):
             (hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day)
         )
         return idade
+    
+    @property
+    def turma_atual(self):
+        """Retorna a turma atual do aluno (matrícula ativa)"""
+        from turmas.models import TurmaAluno
+        turma_aluno = TurmaAluno.objects.filter(aluno=self, ativo=True).first()
+        return turma_aluno.turma if turma_aluno else None

@@ -3,204 +3,488 @@
 
 {% block title %}Sistema Financeiro{% endblock %}
 
-{% block extra_css %}
-<style>
-    .financial-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
-        padding: 25px;
-        color: white;
-        margin-bottom: 20px;
-        transition: transform 0.3s ease;
-    }
-    .financial-card:hover {
-        transform: translateY(-5px);
-    }
-    .financial-number {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    .quick-action {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: #333;
-        display: block;
-    }
-    .quick-action:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-        text-decoration: none;
-        color: #333;
-    }
-    .quick-action i {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        color: #667eea;
-    }
-    .status-pago { color: #28a745; }
-    .status-pendente { color: #ffc107; }
-    .status-vencido { color: #dc3545; }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="h3 mb-4">
-                <i class="fas fa-dollar-sign"></i> Sistema Financeiro
-            </h1>
-        </div>
-    </div>
-
-    <!-- Estatísticas Financeiras -->
-    <div class="row">
-        <div class="col-md-3">
-            <div class="financial-card">
-                <div class="financial-number">R$ {{ valor_total|floatformat:2 }}</div>
-                <div>Total do Mês</div>
+<!-- Header Financeiro -->
+<div class="finance-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="finance-title">
+                    <i class="fas fa-chart-line me-3"></i>
+                    Gestão Financeira
+                </h1>
+                <p class="finance-subtitle">
+                    Controle completo das finanças da sua instituição
+                </p>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="financial-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                <div class="financial-number">R$ {{ valor_recebido|floatformat:2 }}</div>
-                <div>Valor Recebido</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="financial-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <div class="financial-number">R$ {{ valor_pendente|floatformat:2 }}</div>
-                <div>Valor Pendente</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="financial-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <div class="financial-number">{{ total_vencidas }}</div>
-                <div>Mensalidades Vencidas</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Ações Rápidas -->
-    <div class="row">
-        <div class="col-12">
-            <h4 class="mb-3">Ações Rápidas</h4>
-        </div>
-        <div class="col-md-3">
-            <a href="{% url 'financeiro:mensalidade_list' %}" class="quick-action">
-                <i class="fas fa-money-bill-wave"></i>
-                <h6>Gerenciar Mensalidades</h6>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="{% url 'financeiro:gerar_mensalidades' %}" class="quick-action">
-                <i class="fas fa-plus-circle"></i>
-                <h6>Gerar Mensalidades</h6>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="{% url 'financeiro:relatorios' %}" class="quick-action">
-                <i class="fas fa-chart-line"></i>
-                <h6>Relatórios</h6>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="{% url 'financeiro:configuracoes' %}" class="quick-action">
-                <i class="fas fa-cog"></i>
-                <h6>Configurações</h6>
-            </a>
-        </div>
-    </div>
-
-    <!-- Mensalidades Vencidas -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-exclamation-triangle"></i> Mensalidades Vencidas</h5>
-                </div>
-                <div class="card-body">
-                    {% if mensalidades_vencidas %}
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Aluno</th>
-                                        <th>Referência</th>
-                                        <th>Valor</th>
-                                        <th>Vencimento</th>
-                                        <th>Status</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for mensalidade in mensalidades_vencidas %}
-                                    <tr>
-                                        <td>{{ mensalidade.aluno.nome }}</td>
-                                        <td>{{ mensalidade.mes_referencia }}/{{ mensalidade.ano_referencia }}</td>
-                                        <td>R$ {{ mensalidade.valor_total|floatformat:2 }}</td>
-                                        <td>{{ mensalidade.data_vencimento|date:"d/m/Y" }}</td>
-                                        <td>
-                                            <span class="badge badge-danger">
-                                                {{ mensalidade.get_status_display }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a href="{% url 'financeiro:pagar_mensalidade' mensalidade.pk %}" 
-                                               class="btn btn-sm btn-success"
-                                               title="Marcar como pago">
-                                                <i class="fas fa-check"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p class="text-muted">Nenhuma mensalidade vencida encontrada.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráfico de Receitas -->
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-chart-bar"></i> Receitas por Mês</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="receitasChart" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-pie-chart"></i> Status das Mensalidades</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="statusChart" height="300"></canvas>
-                </div>
+            <div class="col-lg-4 text-end">
+                <a href="{% url 'financeiro:gerar_mensalidades' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Gerar Mensalidades
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Cards de Estatísticas -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">R$ {{ valor_total|floatformat:2|default:"0,00" }}</div>
+                        <div class="stat-label">Total do Mês</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">R$ {{ valor_recebido|floatformat:2|default:"0,00" }}</div>
+                        <div class="stat-label">Valor Recebido</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">R$ {{ valor_pendente|floatformat:2|default:"0,00" }}</div>
+                        <div class="stat-label">Valor Pendente</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{ total_vencidas|default:0 }}</div>
+                        <div class="stat-label">Mensalidades Vencidas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Ações Rápidas -->
+<section class="actions-section py-5 bg-light">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Ações Rápidas</h2>
+            <p class="section-subtitle">Acesse rapidamente as principais funcionalidades</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'financeiro:mensalidade_list' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h5>Gerenciar Mensalidades</h5>
+                    <p>Visualize e gerencie todas as mensalidades</p>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'financeiro:gerar_mensalidades' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h5>Gerar Mensalidades</h5>
+                    <p>Crie mensalidades para um período</p>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'financeiro:relatorios' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5>Relatórios</h5>
+                    <p>Análises e relatórios financeiros</p>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'financeiro:configuracoes' %}" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h5>Configurações</h5>
+                    <p>Configure parâmetros financeiros</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mensalidades Vencidas -->
+<section class="overdue-section py-5">
+    <div class="container">
+        <div class="section-header mb-4">
+            <h2 class="section-title">
+                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                Mensalidades Vencidas
+            </h2>
+            {% if total_vencidas %}
+                <span class="badge bg-danger">{{ total_vencidas }} vencida{{ total_vencidas|pluralize }}</span>
+            {% endif %}
+        </div>
+        
+        {% if mensalidades_vencidas %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Referência</th>
+                            <th>Valor</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mensalidade in mensalidades_vencidas %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-circle me-2 text-primary"></i>
+                                    <span class="fw-semibold">{{ mensalidade.aluno.nome }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ mensalidade.mes_referencia }}/{{ mensalidade.ano_referencia }}</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-success">R$ {{ mensalidade.valor_total|floatformat:2|default:"0,00" }}</span>
+                            </td>
+                            <td>{{ mensalidade.data_vencimento|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation me-1"></i>{{ mensalidade.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'financeiro:pagar_mensalidade' mensalidade.pk %}" 
+                                   class="btn btn-sm btn-success" title="Marcar como pago">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state text-center py-5">
+                <i class="fas fa-smile text-success mb-3" style="font-size: 3rem;"></i>
+                <h4 class="text-success">Excelente!</h4>
+                <p class="text-muted">Não há mensalidades vencidas no momento.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Gráficos -->
+<section class="charts-section py-5 bg-light">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Análise Financeira</h2>
+            <p class="section-subtitle">Visualize os dados em gráficos interativos</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5><i class="fas fa-chart-bar me-2"></i>Receitas por Mês</h5>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="receitasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5><i class="fas fa-pie-chart me-2"></i>Status das Mensalidades</h5>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Header Financeiro */
+.finance-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+}
+
+.finance-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.finance-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+/* Cards de Estatísticas */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.primary {
+    border-left: 4px solid #667eea;
+}
+
+.stat-card.success {
+    border-left: 4px solid #28a745;
+}
+
+.stat-card.warning {
+    border-left: 4px solid #ffc107;
+}
+
+.stat-card.danger {
+    border-left: 4px solid #dc3545;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-card.primary .stat-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-card.success .stat-icon {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.stat-card.warning .stat-icon {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.stat-card.danger .stat-icon {
+    background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Ações Rápidas */
+.section-header {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+.action-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #333;
+    display: block;
+    height: 100%;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: #333;
+}
+
+.action-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 1.8rem;
+}
+
+.action-card h5 {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.action-card p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* Tabela de Mensalidades Vencidas */
+.table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.table thead th {
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Gráficos */
+.chart-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    height: 100%;
+}
+
+.chart-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+}
+
+.chart-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.chart-body {
+    padding: 2rem;
+    min-height: 300px;
+}
+
+/* Estados vazios */
+.empty-state {
+    background: white;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .finance-title {
+        font-size: 2rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .action-card {
+        padding: 1.5rem 1rem;
+    }
+}
+</style>
+
+<!-- AOS Animation Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true
+    });
+</script>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Gráfico de Receitas por Mês
+    // Gráfico de Receitas por Mês (exemplo fixo)
     const ctx1 = document.getElementById('receitasChart').getContext('2d');
     new Chart(ctx1, {
         type: 'line',
@@ -210,29 +494,55 @@
                 label: 'Receitas (R$)',
                 data: [12000, 15000, 13000, 17000, 16000, 18000],
                 borderColor: '#667eea',
-                tension: 0.4
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            }
         }
     });
 
     // Gráfico de Status das Mensalidades
+    const totalPagas = {{ total_pagas|default:0 }};
+    const totalPendentes = {{ total_pendentes|default:0 }};
+    const totalVencidas = {{ total_vencidas|default:0 }};
     const ctx2 = document.getElementById('statusChart').getContext('2d');
     new Chart(ctx2, {
         type: 'doughnut',
         data: {
             labels: ['Pagas', 'Pendentes', 'Vencidas'],
             datasets: [{
-                data: [{{ total_pagas }}, {{ total_pendentes }}, {{ total_vencidas }}],
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                data: [totalPagas, totalPendentes, totalVencidas],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 0
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
         }
     });
 </script>

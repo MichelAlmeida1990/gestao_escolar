@@ -136,12 +136,15 @@ class CustomLoginView(LoginView):
         sessoes_ativas = SessaoUsuario.objects.filter(user=user, ativa=True).count()
         
         if sessoes_ativas >= perfil.max_sessions:
-            # Invalidar sessões mais antigas
-            sessoes_antigas = SessaoUsuario.objects.filter(
+            # Invalidar sessões mais antigas (manter apenas as mais recentes até o limite)
+            sessoes_ordenadas = SessaoUsuario.objects.filter(
                 user=user, ativa=True
-            ).order_by('data_ultima_atividade')[:-1]
+            ).order_by('-data_ultima_atividade')
             
-            for sessao in sessoes_antigas:
+            # Pegar sessões que excedem o limite
+            sessoes_para_invalidar = sessoes_ordenadas[perfil.max_sessions-1:]
+            
+            for sessao in sessoes_para_invalidar:
                 sessao.ativa = False
                 sessao.save()
     

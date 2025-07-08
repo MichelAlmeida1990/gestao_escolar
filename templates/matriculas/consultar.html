@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Consultar Matrícula{% endblock %}
+
+{% block content %}
+<div class="education-bg min-vh-100 py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="modern-form text-center">
+                    <div class="mb-4">
+                        <div class="feature-icon mx-auto mb-3">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h2 class="mb-3">Consultar Matrícula</h2>
+                        <p class="text-muted">
+                            Digite o código da matrícula e o e-mail cadastrado para consultar o status
+                        </p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        
+                        <div class="form-floating mb-3">
+                            {{ form.codigo_matricula|add_class:'form-control' }}
+                            <label for="id_codigo_matricula">
+                                <i class="fas fa-barcode me-2"></i>Código da Matrícula
+                            </label>
+                            {{ form.codigo_matricula.errors }}
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            {{ form.email|add_class:'form-control' }}
+                            <label for="id_email">
+                                <i class="fas fa-envelope me-2"></i>E-mail Cadastrado
+                            </label>
+                            {{ form.email.errors }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-modern w-100 mb-3">
+                            <i class="fas fa-search me-2"></i>
+                            Consultar Matrícula
+                        </button>
+                    </form>
+                    
+                    <div class="mt-4 pt-4 border-top">
+                        <p class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            O código da matrícula foi enviado por e-mail após o cadastro
+                        </p>
+                        <a href="{% url 'matriculas:index' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar ao Início
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    {% for message in messages %}
+    <div class="toast show" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-info-circle text-{{ message.tags }} me-2"></i>
+            <strong class="me-auto">Consulta de Matrícula</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %} 

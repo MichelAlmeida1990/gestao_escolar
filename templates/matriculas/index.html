@@ -1,193 +1,186 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load widget_tweaks %}
 
-{% block title %}Matrículas Online - Sistema de Gestão Escolar{% endblock %}
+{% block title %}Matrículas Online - Sistema Gestão Escolar{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <!-- Header -->
-            <div class="text-center mb-5">
-                <h1 class="display-4 text-primary mb-3">
-                    <i class="fas fa-graduation-cap"></i> Matrículas Online
-                </h1>
-                <p class="lead text-muted">
-                    Faça a matrícula do seu filho de forma rápida e segura
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-graduation-cap mb-3"></i><br>
+            Matrículas Online
+        </h1>
+        <p class="hero-subtitle">
+            Realize sua matrícula de forma rápida, segura e totalmente online. 
+            Processo simplificado para sua comodidade.
+        </p>
+        {% if matricula_ativa and periodo_valido %}
+        <a href="{% url 'matriculas:nova_matricula' %}" class="btn btn-modern btn-lg animate-pulse">
+            <i class="fas fa-file-signature me-2"></i>
+            Iniciar Matrícula
+        </a>
+        {% else %}
+        <div class="alert alert-warning modern-card mt-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {% if not matricula_ativa %}
+                As matrículas online estão temporariamente desativadas.
+            {% elif not periodo_valido %}
+                As matrículas não estão abertas no momento.
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Seção de Funcionalidades -->
+<section class="section-bg-1 py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8 text-center">
+                <h2 class="display-5 fw-bold mb-4 animate-fadeInUp">
+                    Como Funciona
+                </h2>
+                <p class="lead text-muted animate-fadeInUp">
+                    Processo simples e intuitivo em apenas alguns passos
                 </p>
             </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h4 class="mb-3">1. Preencha os Dados</h4>
+                    <p class="text-muted">
+                        Complete o formulário com as informações do aluno e responsável
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <h4 class="mb-3">2. Envie Documentos</h4>
+                    <p class="text-muted">
+                        Faça upload dos documentos necessários de forma segura
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4 class="mb-3">3. Acompanhe o Status</h4>
+                    <p class="text-muted">
+                        Receba atualizações por email e consulte o andamento online
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-            <!-- Status das Matrículas -->
-            {% if not matricula_ativa %}
-                <div class="alert alert-warning text-center" role="alert">
-                    <h4 class="alert-heading">
-                        <i class="fas fa-exclamation-triangle"></i> Matrículas Temporariamente Desativadas
-                    </h4>
-                    <p class="mb-0">
-                        As matrículas online estão temporariamente indisponíveis. 
-                        Entre em contato conosco para mais informações.
+<!-- Seção de Consulta -->
+<section class="section-bg-2 py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="modern-card text-center">
+                    <h3 class="mb-4">
+                        <i class="fas fa-search text-primary me-2"></i>
+                        Consultar Matrícula
+                    </h3>
+                    <p class="text-muted mb-4">
+                        Já fez sua matrícula? Consulte o status e acompanhe o andamento
                     </p>
+                    <a href="{% url 'matriculas:consultar' %}" class="btn btn-modern">
+                        <i class="fas fa-search me-2"></i>
+                        Consultar Status
+                    </a>
                 </div>
-            {% elif not periodo_valido and config %}
-                <div class="alert alert-info text-center" role="alert">
-                    <h4 class="alert-heading">
-                        <i class="fas fa-calendar-alt"></i> Período de Matrículas
-                    </h4>
-                    <p class="mb-0">
-                        As matrículas estão abertas apenas entre 
-                        <strong>{{ config.data_inicio_matriculas|date:"d/m/Y" }}</strong> e 
-                        <strong>{{ config.data_fim_matriculas|date:"d/m/Y" }}</strong>.
-                    </p>
-                </div>
-            {% else %}
-                <!-- Cards de Ação -->
-                <div class="row mb-5">
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center p-5">
-                                <div class="mb-4">
-                                    <i class="fas fa-user-plus fa-3x text-primary"></i>
-                                </div>
-                                <h4 class="card-title">Nova Matrícula</h4>
-                                <p class="card-text text-muted">
-                                    Preencha o formulário online e envie os documentos necessários.
-                                </p>
-                                <a href="{% url 'matriculas:nova_matricula' %}" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-plus"></i> Fazer Matrícula
-                                </a>
-                            </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção de Informações -->
+{% if config %}
+<section class="classroom-bg py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="modern-card">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-info-circle text-info me-2"></i>
+                        Informações Importantes
+                    </h3>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-calendar-alt text-primary me-2"></i>Período de Matrículas</h5>
+                            <p class="mb-3">
+                                <strong>Início:</strong> {{ config.data_inicio_matriculas|date:'d/m/Y' }}<br>
+                                <strong>Término:</strong> {{ config.data_fim_matriculas|date:'d/m/Y' }}
+                            </p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-graduation-cap text-success me-2"></i>Séries Disponíveis</h5>
+                            <ul class="list-unstyled">
+                                {% for serie in config.series_disponiveis|slice:":5" %}
+                                <li><i class="fas fa-check text-success me-2"></i>{{ serie }}</li>
+                                {% endfor %}
+                                {% if config.series_disponiveis|length > 5 %}
+                                <li class="text-muted"><i class="fas fa-ellipsis-h me-2"></i>E mais...</li>
+                                {% endif %}
+                            </ul>
                         </div>
                     </div>
                     
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center p-5">
-                                <div class="mb-4">
-                                    <i class="fas fa-search fa-3x text-success"></i>
+                    <div class="row g-4 mt-3">
+                        <div class="col-md-12">
+                            <h5><i class="fas fa-file-alt text-warning me-2"></i>Documentos Necessários</h5>
+                            <div class="row">
+                                {% for doc in config.documentos_obrigatorios %}
+                                <div class="col-md-4 mb-2">
+                                    <small class="badge bg-light text-dark">
+                                        <i class="fas fa-file me-1"></i>
+                                        {% if doc == 'certidao_nascimento' %}Certidão de Nascimento
+                                        {% elif doc == 'rg' %}RG
+                                        {% elif doc == 'cpf' %}CPF
+                                        {% elif doc == 'comprovante_residencia' %}Comprovante de Residência
+                                        {% elif doc == 'historico_escolar' %}Histórico Escolar
+                                        {% elif doc == 'carteira_vacinacao' %}Carteira de Vacinação
+                                        {% elif doc == 'foto' %}Foto 3x4
+                                        {% else %}{{ doc }}
+                                        {% endif %}
+                                    </small>
                                 </div>
-                                <h4 class="card-title">Consultar Matrícula</h4>
-                                <p class="card-text text-muted">
-                                    Acompanhe o status da sua matrícula usando o código recebido.
-                                </p>
-                                <a href="{% url 'matriculas:consultar' %}" class="btn btn-success btn-lg">
-                                    <i class="fas fa-search"></i> Consultar
-                                </a>
+                                {% endfor %}
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Informações Importantes -->
-                <div class="row">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-info-circle"></i> Informações Importantes
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6 class="text-primary">
-                                            <i class="fas fa-clock"></i> Documentos Necessários
-                                        </h6>
-                                        <ul class="list-unstyled">
-                                            <li><i class="fas fa-check text-success"></i> Certidão de Nascimento</li>
-                                            <li><i class="fas fa-check text-success"></i> RG e CPF</li>
-                                            <li><i class="fas fa-check text-success"></i> Comprovante de Residência</li>
-                                            <li><i class="fas fa-check text-success"></i> Histórico Escolar</li>
-                                            <li><i class="fas fa-check text-success"></i> Carteira de Vacinação</li>
-                                            <li><i class="fas fa-check text-success"></i> Foto 3x4</li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6 class="text-primary">
-                                            <i class="fas fa-graduation-cap"></i> Séries Disponíveis
-                                        </h6>
-                                        <ul class="list-unstyled">
-                                            <li><i class="fas fa-check text-success"></i> Educação Infantil</li>
-                                            <li><i class="fas fa-check text-success"></i> Ensino Fundamental</li>
-                                            <li><i class="fas fa-check text-success"></i> Manhã, Tarde e Noite</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Processo de Matrícula -->
-                <div class="row mt-5">
-                    <div class="col-12">
-                        <h3 class="text-center mb-4">Como Funciona</h3>
-                        <div class="row">
-                            <div class="col-md-3 text-center mb-4">
-                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                    <span class="h2 text-primary">1</span>
-                                </div>
-                                <h5>Preencha o Formulário</h5>
-                                <p class="text-muted">Informe os dados do aluno e responsável</p>
-                            </div>
-                            <div class="col-md-3 text-center mb-4">
-                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                    <span class="h2 text-primary">2</span>
-                                </div>
-                                <h5>Envie os Documentos</h5>
-                                <p class="text-muted">Faça upload dos documentos necessários</p>
-                            </div>
-                            <div class="col-md-3 text-center mb-4">
-                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                    <span class="h2 text-primary">3</span>
-                                </div>
-                                <h5>Aguarde a Análise</h5>
-                                <p class="text-muted">Nossa equipe analisará sua matrícula</p>
-                            </div>
-                            <div class="col-md-3 text-center mb-4">
-                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                    <span class="h2 text-primary">4</span>
-                                </div>
-                                <h5>Receba a Confirmação</h5>
-                                <p class="text-muted">Acompanhe o status por email</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- Contato -->
-            <div class="row mt-5">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <h5 class="text-primary">
-                                <i class="fas fa-phone"></i> Precisa de Ajuda?
-                            </h5>
-                            <p class="mb-0">
-                                Entre em contato conosco: 
-                                <strong>(11) 99999-9999</strong> | 
-                                <strong>contato@escola.com</strong>
-                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</section>
+{% endif %}
 
-{% block extra_css %}
-<style>
-    .card {
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-    .btn-lg {
-        padding: 12px 30px;
-        font-size: 1.1rem;
-    }
-</style>
+<!-- AOS Animation Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true
+    });
+</script>
 {% endblock %} 

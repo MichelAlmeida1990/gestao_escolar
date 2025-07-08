@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Escolar - Bem-vindo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f8f9fa;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0 1rem 0;
+        }
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .menu {
+            display: flex;
+            gap: 2rem;
+        }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .menu a:hover {
+            color: #ffd700;
+        }
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem 2rem 1rem;
+            background: white;
+        }
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #764ba2;
+            margin-bottom: 2rem;
+        }
+        .cta-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.9rem 2.2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+            transition: background 0.2s;
+        }
+        .cta-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .benefits {
+            background: #f4f6fb;
+            padding: 3rem 1rem;
+        }
+        .benefits-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        .benefit-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .benefit-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.07);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            width: 230px;
+        }
+        .benefit-card i {
+            font-size: 2.2rem;
+            color: #764ba2;
+            margin-bottom: 1rem;
+        }
+        .benefit-card h4 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .benefit-card p {
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+        .steps {
+            background: white;
+            padding: 3rem 1rem;
+        }
+        .steps-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #764ba2;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        .steps-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .step {
+            background: #f4f6fb;
+            border-radius: 12px;
+            padding: 1.5rem 1.2rem;
+            text-align: center;
+            width: 200px;
+        }
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.7rem auto;
+        }
+        .step-title {
+            font-size: 1.05rem;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        .step-desc {
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem 2rem 1rem;
+        }
+        .cta-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .cta-section p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        .footer {
+            background: #232946;
+            color: #fff;
+            text-align: center;
+            padding: 1.5rem 1rem 1rem 1rem;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 900px) {
+            .benefit-cards, .steps-list {
+                flex-direction: column;
+                align-items: center;
+            }
+            .header .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="logo">Gestão Escolar</div>
+            <nav class="menu">
+                <a href="#beneficios">Benefícios</a>
+                <a href="#como-funciona">Como Funciona</a>
+                <a href="#contato">Contato</a>
+                <a href="/usuarios/login/" class="cta-btn" style="padding: 0.5rem 1.2rem; font-size: 1rem;">Entrar</a>
+            </nav>
+        </div>
+    </div>
+    <div class="hero">
+        <div class="hero-title">Solução Completa para Gestão Escolar</div>
+        <div class="hero-subtitle">Organize, controle e potencialize sua escola com tecnologia, segurança e praticidade.</div>
+        <a href="#contato" class="cta-btn">Solicitar Demonstração</a>
+    </div>
+    <div class="benefits" id="beneficios">
+        <div class="benefits-title">Por que escolher nosso sistema?</div>
+        <div class="benefit-cards">
+            <div class="benefit-card">
+                <i class="fas fa-bolt"></i>
+                <h4>Implantação Rápida</h4>
+                <p>Comece a usar em poucos dias, sem complicação.</p>
+            </div>
+            <div class="benefit-card">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Segurança de Dados</h4>
+                <p>Proteção total das informações da sua escola.</p>
+            </div>
+            <div class="benefit-card">
+                <i class="fas fa-chart-line"></i>
+                <h4>Gestão Financeira</h4>
+                <p>Controle de mensalidades, relatórios e inadimplência.</p>
+            </div>
+            <div class="benefit-card">
+                <i class="fas fa-users"></i>
+                <h4>Multiusuário</h4>
+                <p>Perfis para direção, professores, responsáveis e alunos.</p>
+            </div>
+        </div>
+    </div>
+    <div class="steps" id="como-funciona">
+        <div class="steps-title">Como funciona?</div>
+        <div class="steps-list">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-title">Solicite uma demonstração</div>
+                <div class="step-desc">Entre em contato e conheça o sistema na prática.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-title">Personalize para sua escola</div>
+                <div class="step-desc">Configuramos conforme sua necessidade.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-title">Comece a usar</div>
+                <div class="step-desc">Acesse de qualquer lugar, a qualquer hora.</div>
+            </div>
+        </div>
+    </div>
+    <div class="cta-section" id="contato">
+        <h2>Pronto para transformar sua gestão escolar?</h2>
+        <p>Solicite uma demonstração gratuita ou entre em contato para saber mais.</p>
+        <a href="mailto:contato@suaescola.com" class="cta-btn">Fale Conosco</a>
+    </div>
+    <div class="footer">
+        &copy; {{ year|default:2025 }} Gestão Escolar. Todos os direitos reservados.<br>
+        <span style="color:#b8c1ec;">Desenvolvido com tecnologia nacional.</span>
+    </div>
+</body>
+</html> 

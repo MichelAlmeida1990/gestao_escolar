@@ -3,48 +3,95 @@
 {% block title %}Lista de Alunos{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Alunos</h1>
-        <a href="{% url 'alunos:aluno_create' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Novo Aluno
-        </a>
+<!-- Hero Section -->
+<section class="students-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <i class="fas fa-user-graduate me-3"></i>
+                        Gestão de Alunos
+                    </h1>
+                    <p class="hero-subtitle">
+                        Acompanhe o desenvolvimento e cadastro de todos os estudantes da sua instituição
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">{{ alunos.count|default:0 }}</span>
+                            <span class="stat-label">Alunos Cadastrados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="hero-actions">
+                    <a href="{% url 'alunos:aluno_create' %}" class="btn btn-modern btn-lg">
+                        <i class="fas fa-plus me-2"></i>Novo Aluno
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+</section>
     
-    <!-- Mensagens de feedback -->
+<!-- Messages -->
     {% if messages %}
+<section class="py-3">
+    <div class="container">
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
+            <div class="alert alert-modern alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endfor %}
+    </div>
+</section>
     {% endif %}
     
-    <!-- Formulário de busca -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Buscar por nome, matrícula ou CPF" value="{{ search }}">
-                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+<!-- Search Section -->
+<section class="search-section py-4">
+    <div class="container">
+        <div class="search-card">
+            <div class="search-header">
+                <h4><i class="fas fa-search me-2"></i>Buscar Alunos</h4>
+            </div>
+            <form method="get" class="search-form">
+                <div class="input-group">
+                    <div class="form-floating">
+                        <input type="text" name="search" id="searchInput" class="form-control" placeholder="Digite o nome, matrícula ou CPF" value="{{ search }}">
+                        <label for="searchInput">Buscar por nome, matrícula ou CPF</label>
+                    </div>
+                    <button type="submit" class="btn btn-search">
+                        <i class="fas fa-search"></i>
+                    </button>
                 {% if search %}
-                    <a href="{% url 'alunos:aluno_list' %}" class="btn btn-outline-secondary ms-2">Limpar</a>
+                        <a href="{% url 'alunos:aluno_list' %}" class="btn btn-clear">
+                            <i class="fas fa-times"></i>
+                        </a>
                 {% endif %}
+                </div>
             </form>
         </div>
     </div>
-    
-    <!-- Tabela de alunos -->
-    <div class="card">
-        <div class="card-body">
+</section>
+
+<!-- Students Table Section -->
+<section class="students-section py-5 section-bg-1">
+    <div class="container">
+        <div class="students-card">
             {% if alunos %}
+                <div class="table-header">
+                    <h3><i class="fas fa-users me-2"></i>Lista de Alunos</h3>
+                    <span class="badge badge-modern primary">{{ alunos.count }} aluno{{ alunos.count|pluralize }}</span>
+                </div>
+                
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-modern">
                         <thead>
                             <tr>
-                                <th>Foto</th>
+                                <th>Aluno</th>
                                 <th>Matrícula</th>
-                                <th>Nome</th>
                                 <th>Data de Nascimento</th>
                                 <th>Status</th>
                                 <th>Ações</th>
@@ -52,38 +99,55 @@
                         </thead>
                         <tbody>
                             {% for aluno in alunos %}
-                                <tr>
+                                <tr data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
                                     <td>
+                                        <div class="student-info">
+                                            <div class="student-avatar">
                                         {% if aluno.foto %}
-                                            <img src="{{ aluno.foto.url }}" alt="Foto de {{ aluno.nome }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                                    <img src="{{ aluno.foto.url }}" alt="Foto de {{ aluno.nome }}">
                                         {% else %}
-                                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                <i class="fas fa-user text-secondary"></i>
+                                                    <div class="avatar-placeholder">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                {% endif %}
                                             </div>
-                                        {% endif %}
+                                            <div class="student-details">
+                                                <h6 class="student-name">{{ aluno.nome }}</h6>
+                                                <small class="text-muted">{{ aluno.email|default:"Email não informado" }}</small>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>{{ aluno.matricula }}</td>
-                                    <td>{{ aluno.nome }}</td>
+                                    <td>
+                                        <span class="matricula-badge">{{ aluno.matricula }}</span>
+                                    </td>
                                     <td>{{ aluno.data_nascimento|date:"d/m/Y" }}</td>
                                     <td>
                                         {% if aluno.status == 'ativo' %}
-                                            <span class="badge bg-success">Ativo</span>
+                                            <span class="badge badge-modern success">
+                                                <i class="fas fa-check me-1"></i>Ativo
+                                            </span>
                                         {% elif aluno.status == 'inativo' %}
-                                            <span class="badge bg-danger">Inativo</span>
+                                            <span class="badge badge-modern danger">
+                                                <i class="fas fa-times me-1"></i>Inativo
+                                            </span>
                                         {% elif aluno.status == 'transferido' %}
-                                            <span class="badge bg-warning">Transferido</span>
+                                            <span class="badge badge-modern warning">
+                                                <i class="fas fa-exchange-alt me-1"></i>Transferido
+                                            </span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'alunos:aluno_detail' aluno.pk %}" class="btn btn-sm btn-info" title="Visualizar">
+                                        <div class="action-buttons">
+                                            <a href="{% url 'alunos:aluno_detail' aluno.pk %}" class="btn btn-action info" title="Visualizar">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{% url 'alunos:aluno_update' aluno.pk %}" class="btn btn-sm btn-warning" title="Editar">
+                                            <a href="{% url 'alunos:aluno_update' aluno.pk %}" class="btn btn-action warning" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{% url 'alunos:aluno_delete' aluno.pk %}" class="btn btn-sm btn-danger" title="Excluir">
+                                            <a href="{% url 'alunos:aluno_delete' aluno.pk %}" class="btn btn-action danger" title="Excluir">
                                             <i class="fas fa-trash"></i>
                                         </a>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -91,30 +155,19 @@
                     </table>
                 </div>
                 
-                <!-- Paginação -->
+                <!-- Pagination -->
                 {% if is_paginated %}
-                <nav aria-label="Paginação">
-                    <ul class="pagination justify-content-center">
+                <nav class="pagination-nav" aria-label="Paginação">
+                    <ul class="pagination">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}" aria-label="Primeira">
-                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}" aria-label="Anterior">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" aria-label="Primeira">
-                                    <span aria-hidden="true">&laquo;&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" aria-label="Anterior">
-                                    <span aria-hidden="true">&laquo;</span>
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
                                 </a>
                             </li>
                         {% endif %}
@@ -122,7 +175,7 @@
                         {% for num in page_obj.paginator.page_range %}
                             {% if page_obj.number == num %}
                                 <li class="page-item active">
-                                    <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}">{{ num }}</a>
+                                    <span class="page-link">{{ num }}</span>
                                 </li>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                                 <li class="page-item">
@@ -133,24 +186,13 @@
                         
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}" aria-label="Próxima">
-                                    <span aria-hidden="true">&raquo;</span>
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}" aria-label="Última">
-                                    <span aria-hidden="true">&raquo;&raquo;</span>
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" aria-label="Próxima">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" aria-label="Última">
-                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
                                 </a>
                             </li>
                         {% endif %}
@@ -159,15 +201,356 @@
                 {% endif %}
                 
             {% else %}
-                <div class="alert alert-info">
+                <div class="empty-state">
+                    <i class="fas fa-user-graduate text-muted mb-3"></i>
+                    <h4 class="text-muted">
+                        {% if search %}
+                            Nenhum aluno encontrado
+                        {% else %}
+                            Nenhum aluno cadastrado
+                        {% endif %}
+                    </h4>
+                    <p class="text-muted">
                     {% if search %}
-                        Nenhum aluno encontrado com o termo "{{ search }}".
+                            Não encontramos alunos com o termo "{{ search }}".
                     {% else %}
-                        Nenhum aluno cadastrado.
+                            Comece adicionando o primeiro aluno ao sistema.
+                        {% endif %}
+                    </p>
+                    {% if not search %}
+                    <a href="{% url 'alunos:aluno_create' %}" class="btn btn-modern">
+                        <i class="fas fa-plus me-2"></i>Adicionar Primeiro Aluno
+                    </a>
                     {% endif %}
                 </div>
             {% endif %}
         </div>
     </div>
-</div>
+</section>
+
+<style>
+    /* Hero Section */
+    .students-hero {
+        background: linear-gradient(135deg, 
+            rgba(67, 97, 238, 0.9) 0%, 
+            rgba(114, 9, 183, 0.8) 50%, 
+            rgba(247, 37, 133, 0.9) 100%
+        ),
+        url('https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover;
+        min-height: 50vh;
+        display: flex;
+        align-items: center;
+        color: white;
+        position: relative;
+    }
+
+    .students-hero::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .students-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-stats {
+        margin-top: 2rem;
+    }
+
+    .stat-item {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        margin-right: 1rem;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    /* Search Section */
+    .search-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    .search-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 1.5rem 2rem;
+    }
+
+    .search-header h4 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .search-form {
+        padding: 2rem;
+    }
+
+    .input-group .form-floating {
+        flex: 1;
+    }
+
+    .btn-search {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 0 1.5rem;
+        border-radius: 0 12px 12px 0;
+        margin-left: -1px;
+    }
+
+    .btn-clear {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0 1.5rem;
+        border-radius: 0 12px 12px 0;
+        margin-left: -1px;
+    }
+
+    /* Students Card */
+    .students-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    .table-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 1.5rem 2rem;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+
+    .table-header h3 {
+        margin: 0;
+        font-weight: 600;
+        flex: 1;
+    }
+
+    /* Modern Table */
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead th {
+        background: #f8f9fa;
+        color: #495057;
+        border: none;
+        padding: 1.2rem 1rem;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table-modern tbody tr {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .table-modern tbody tr:hover {
+        background: rgba(67, 97, 238, 0.05);
+        transform: scale(1.01);
+    }
+
+    .table-modern td {
+        padding: 1.2rem 1rem;
+        border: none;
+        vertical-align: middle;
+    }
+
+    /* Student Info */
+    .student-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .student-avatar {
+        margin-right: 1rem;
+        position: relative;
+    }
+
+    .student-avatar img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-placeholder {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .student-name {
+        margin: 0 0 0.2rem 0;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .matricula-badge {
+        background: rgba(67, 97, 238, 0.1);
+        color: var(--primary);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .btn-action.info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-action.warning {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .btn-action.danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Badges */
+    .badge-modern {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+
+    .badge-modern.success {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+        color: white;
+    }
+
+    .badge-modern.danger {
+        background: linear-gradient(135deg, #fa709a, #fee140);
+        color: white;
+    }
+
+    .badge-modern.warning {
+        background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+        color: #2d3436;
+    }
+
+    .badge-modern.primary {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    /* Pagination */
+    .pagination-nav {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .pagination {
+        justify-content: center;
+        margin: 0;
+    }
+
+    .pagination .page-item .page-link {
+        border-radius: 8px;
+        margin: 0 0.2rem;
+        border: 1px solid #dee2e6;
+        color: var(--primary);
+    }
+
+    .pagination .page-item.active .page-link {
+        background: var(--gradient-primary);
+        border-color: transparent;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Alert Modern */
+    .alert-modern {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .alert-modern.alert-success {
+        background: rgba(40, 167, 69, 0.1);
+        color: #155724;
+    }
+</style>
+
+<!-- AOS Animation Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 600,
+        easing: 'ease-out-cubic',
+        once: true
+    });
+</script>
 {% endblock %}
