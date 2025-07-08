@@ -25,6 +25,7 @@
             justify-content: space-between;
             max-width: 1100px;
             margin: 0 auto;
+            padding: 0 1rem;
         }
         .logo {
             font-size: 2rem;
@@ -34,6 +35,7 @@
         .menu {
             display: flex;
             gap: 2rem;
+            align-items: center;
         }
         .menu a {
             color: white;
@@ -54,11 +56,13 @@
             font-weight: 700;
             color: #667eea;
             margin-bottom: 1rem;
+            line-height: 1.2;
         }
         .hero-subtitle {
             font-size: 1.2rem;
             color: #764ba2;
             margin-bottom: 2rem;
+            line-height: 1.5;
         }
         .cta-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -71,6 +75,8 @@
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(102,126,234,0.08);
             transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
         .cta-btn:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
@@ -101,6 +107,10 @@
             padding: 2rem 1.5rem;
             text-align: center;
             width: 230px;
+            transition: transform 0.3s ease;
+        }
+        .benefit-card:hover {
+            transform: translateY(-5px);
         }
         .benefit-card i {
             font-size: 2.2rem;
@@ -141,6 +151,10 @@
             padding: 1.5rem 1.2rem;
             text-align: center;
             width: 200px;
+            transition: transform 0.3s ease;
+        }
+        .step:hover {
+            transform: translateY(-3px);
         }
         .step-number {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -187,6 +201,14 @@
             padding: 1.5rem 1rem 1rem 1rem;
             font-size: 0.95rem;
         }
+        
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            .header .container {
+                padding: 0 2rem;
+            }
+        }
+        
         @media (max-width: 900px) {
             .benefit-cards, .steps-list {
                 flex-direction: column;
@@ -195,6 +217,127 @@
             .header .container {
                 flex-direction: column;
                 gap: 1rem;
+                padding: 0 1rem;
+            }
+            .menu {
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Mobile específico */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.7rem;
+            }
+            .menu {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .hero {
+                padding: 2rem 1rem 1.5rem 1rem;
+            }
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: 0.8rem;
+            }
+            .hero-subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 1.5rem;
+            }
+            .benefits-title, .steps-title {
+                font-size: 1.7rem;
+                margin-bottom: 1.5rem;
+            }
+            .benefits {
+                padding: 2rem 1rem;
+            }
+            .steps {
+                padding: 2rem 1rem;
+            }
+            .benefit-card {
+                width: 100%;
+                max-width: 300px;
+                padding: 1.5rem 1rem;
+            }
+            .step {
+                width: 100%;
+                max-width: 280px;
+                padding: 1.2rem 1rem;
+            }
+            .cta-section {
+                padding: 2rem 1rem 1.5rem 1rem;
+            }
+            .cta-section h2 {
+                font-size: 1.7rem;
+            }
+            .cta-section p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            .cta-btn {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+        }
+        
+        /* Mobile pequeno */
+        @media (max-width: 480px) {
+            .header {
+                padding: 1.5rem 0 0.8rem 0;
+            }
+            .logo {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            .menu {
+                gap: 0.8rem;
+                font-size: 0.9rem;
+            }
+            .menu .cta-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.9rem;
+            }
+            .hero {
+                padding: 1.5rem 0.8rem 1.2rem 0.8rem;
+            }
+            .hero-title {
+                font-size: 1.7rem;
+                margin-bottom: 0.6rem;
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+                margin-bottom: 1.2rem;
+            }
+            .benefits, .steps {
+                padding: 1.5rem 0.8rem;
+            }
+            .benefits-title, .steps-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.2rem;
+            }
+            .benefit-card {
+                padding: 1.2rem 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+            .step {
+                padding: 1rem 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+            .cta-section {
+                padding: 1.5rem 0.8rem 1.2rem 0.8rem;
+            }
+            .cta-section h2 {
+                font-size: 1.5rem;
+                margin-bottom: 0.8rem;
+            }
+            .cta-section p {
+                font-size: 0.95rem;
+                margin-bottom: 1.2rem;
+            }
+            .footer {
+                padding: 1.2rem 0.8rem 0.8rem 0.8rem;
+                font-size: 0.9rem;
             }
         }
     </style>
