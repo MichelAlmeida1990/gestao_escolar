@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import datetime, timedelta
+from decimal import Decimal
 import random
 from faker import Faker
 
@@ -450,11 +451,34 @@ class Command(BaseCommand):
                     status = 'pendente'
                     data_pagamento = None
                 
+                # Obter turma do aluno
+                turma_aluno = TurmaAluno.objects.filter(aluno=aluno, ativo=True).first()
+                turma = turma_aluno.turma if turma_aluno else Turma.objects.first()
+                
+                # Calcular valores
+                valor_desconto = Decimal('0.00')
+                valor_juros = Decimal('0.00')
+                valor_multa = Decimal('0.00')
+                
+                if status == 'vencido':
+                    # Adicionar juros e multa para mensalidades vencidas
+                    dias_atraso = (timezone.now().date() - data_vencimento).days
+                    if dias_atraso > 5:  # Carência de 5 dias
+                        valor_juros = valor_base * Decimal('0.01') * (dias_atraso // 30)  # 1% ao mês
+                        valor_multa = Decimal('10.00')  # Multa fixa
+                
+                valor_total = valor_base - valor_desconto + valor_juros + valor_multa
+                
                 Mensalidade.objects.create(
                     aluno=aluno,
+                    turma=turma,
                     mes_referencia=mes,
                     ano_referencia=ano_atual,
-                    valor_total=valor_base,
+                    valor_base=valor_base,
+                    valor_desconto=valor_desconto,
+                    valor_juros=valor_juros,
+                    valor_multa=valor_multa,
+                    valor_total=valor_total,
                     data_vencimento=data_vencimento,
                     data_pagamento=data_pagamento,
                     status=status,
